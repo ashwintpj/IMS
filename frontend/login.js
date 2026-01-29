@@ -79,7 +79,7 @@ async function handleLogin(event) {
   result.className = 'message';
 
   try {
-    const response = await fetch(`http://127.0.0.1:8000/login/${currentLoginType}`, {
+    const response = await fetch(`https://ims-ia4p.onrender.com/login/${currentLoginType}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
@@ -137,7 +137,7 @@ async function handleSignup(event) {
   result.className = 'message';
 
   try {
-    const response = await fetch(`http://127.0.0.1:8000/create-user`, {
+    const response = await fetch(`https://ims-ia4p.onrender.com/create-user`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

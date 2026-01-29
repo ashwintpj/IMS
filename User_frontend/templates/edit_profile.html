@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="/static/order.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <ul>
+                <li><a href="/user/order">Place Order</a></li>
+                <li><a href="/user/view_profile">Profile</a></li>
+                <li><a href="/user/history">Order History</a></li>
+            </ul>
+        </div>
+
+        <!-- Main content -->
+        <div class="main-content">
+            <h2>Edit Profile</h2>
+
+            <form action="/user/profile/edit" method="post">
+                <label>Full Name:</label>
+                <input type="text" name="full_name" value="{{ user.full_name }}" required>
+
+                <label>Department:</label>
+                <input type="text" name="department" value="{{ user.department }}" required>
+
+                <label>Ward:</label>
+                <input type="text" name="ward" value="{{ user.ward }}" required>
+
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

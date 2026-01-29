@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Profile</title>
+    <link rel="stylesheet" href="/static/auth.css">
+</head>
+<body>
+    <div class="auth-container">
+        <h2>User Information</h2>
+
+        <form action="/user/profile" method="post">
+            <label>Full Name:</label>
+            <input type="text" name="full_name" required>
+
+            <label>Department:</label>
+            <input type="text" name="department" required>
+
+            <label>Ward:</label>
+            <input type="text" name="ward" required>
+
+            <button type="submit">Save & Continue</button>
+        </form>
+    </div>
+</body>
+</html>

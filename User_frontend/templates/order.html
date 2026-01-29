@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Place Order</title>
+    <link rel="stylesheet" href="/static/order.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar / Dashboard -->
+        <aside class="sidebar">
+            <h3>Dashboard</h3>
+            <nav>
+                <ul>
+                    <li><a href="/user/view_profile">Profile</a></li>
+                    <li><a href="/user/history">Order History</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <h2>Request Specimen Containers</h2>
+
+                <form action="/user/order" method="post">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Select</th>
+                                <th>Item</th>
+                                <th>Barcode</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in items %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="item_ids" value="{{ item._id }}">
+                                </td>
+                                <td>{{ item.name }}</td>
+                                <td>
+                                    <img src="{{ item.barcode_image }}" alt="barcode" class="barcode" onclick="selectItem('{{ item._id }}')">
+                                </td>
+                                <td>
+                                    <input type="number" name="qty_{{ item._id }}" min="1">
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <button type="submit">Submit Order</button>
+                </form>
+
+                <script>
+                function selectItem(itemId) {
+                    const checkbox = document.querySelector(`input[value='${itemId}']`);
+                    const qtyInput = document.querySelector(`input[name='qty_${itemId}']`);
+                    
+                    if (checkbox && qtyInput) {
+                        checkbox.checked = true;
+                        qtyInput.focus();
+                    }
+                }
+                </script>
+
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile</title>
+    <link rel="stylesheet" href="/static/order.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <ul>
+                <li><a href="/user/order">Place Order</a></li>
+                <li><a href="/user/view_profile" class="active">Profile</a></li>
+                <li><a href="/user/history">Order History</a></li>
+            </ul>
+        </div>
+
+        <!-- Main content -->
+        <div class="main-content">
+            <h2>Your Profile</h2>
+            <div class="profile-card">
+                <p><strong>Full Name:</strong> {{ user.full_name or "Not Provided" }}</p>
+                <p><strong>Department:</strong> {{ user.department or "Not Provided" }}</p>
+                <p><strong>Ward:</strong> {{ user.ward or "Not Provided" }}</p>
+
+                <a href="/user/profile/edit" class="edit-btn">Edit Profile</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

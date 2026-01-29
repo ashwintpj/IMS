@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order History</title>
+    <link rel="stylesheet" href="/static/order_history.css">
+</head>
+<body>
+    <h2>My Order History</h2>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Date & Time</th>
+                    <th>Items</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order._id }}</td>
+                    <td>{{ order.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+                   <td>
+                        <ul>
+                        {% for item in order['items'] %}
+                            <li>{{ item['name'] }} × {{ item['quantity'] }}</li>
+                        {% endfor %}
+                        </ul>
+                    </td>
+                    <td class="status {{ order.status }}">{{ order.status | capitalize }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,19 +1,2 @@
-# Environment variables
-.env
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-.venv/
-env/
-venv/
-ENV/
-
-# Development tools
-.vscode/
-.idea/
-
-# OS files
-.DS_Store
-Thumbs.db
+env

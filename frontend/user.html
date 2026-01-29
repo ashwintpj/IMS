@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ward Dashboard | IMS</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="dashboard-body">
+
+    <!-- Top Navigation Bar -->
+    <header class="top-navbar">
+        <div class="nav-brand">
+            <div class="logo-icon small" style="background: #ecfdf5; color: #059669;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </div>
+            <h3>Ward Portal</h3>
+        </div>
+
+        <nav class="nav-links">
+            <button class="nav-btn active" data-section="dashboard" onclick="showSection('dashboard')"
+                data-i18n="nav.dashboard">Dashboard</button>
+            <button class="nav-btn" data-section="new-request" onclick="showSection('new-request')"
+                data-i18n="nav.new_request">New Request</button>
+            <button class="nav-btn" data-section="history" onclick="showSection('history')"
+                data-i18n="nav.history">Request History</button>
+        </nav>
+
+        <div class="nav-user">
+            <button id="langBtn" class="language-btn" onclick="toggleLanguage()">
+                English
+            </button>
+
+            <div class="user-profile">
+                <div class="avatar-sm" style="background: #ecfdf5; color: #059669;">W</div>
+                <span id="userName" data-i18n="nav.profile">Ward Staff</span>
+            </div>
+            <button class="logout-btn-top" onclick="logout()" title="Logout">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+    </header>
+
+    <!-- Mobile Dropdown -->
+    <div class="mobile-menu" id="mobileMenu"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-header">
+            <h2 id="pageTitle" data-i18n="header.ward_dashboard">Ward Dashboard</h2>
+        </div>
+
+        <div id="contentArea" class="content-area">
+            <!-- Content loaded via JS -->
+        </div>
+    </main>
+
+    <script src="i18n.js"></script>
+    <script src="user.js"></script>
+</body>
+
+</html>

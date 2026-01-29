@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IMS Login | Hospital Inventory</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div class="login-container">
+    <!-- Logo -->
+    <div class="logo">
+      <div class="logo-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+      </div>
+      <h1>Hospital IMS</h1>
+    </div>
+
+    <!-- Login Card -->
+    <div class="login-card">
+      <h2>Welcome back</h2>
+      <p class="subtitle">Sign in to your account</p>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" data-type="user" onclick="switchTab('user')">User</button>
+        <button class="tab" data-type="admin" onclick="switchTab('admin')">Admin</button>
+      </div>
+
+      <!-- Login Form (Visible by default) -->
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn-login" id="loginBtn">
+          <span id="loginBtnText">Sign In</span>
+          <span id="loginBtnLoader" class="hidden">Signing in...</span>
+        </button>
+      </form>
+
+      <!-- Signup Form (Hidden by default) -->
+      <form id="signupForm" class="hidden" onsubmit="handleSignup(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" placeholder="John" required>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" placeholder="Doe" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="signupEmail">Email</label>
+          <input type="email" id="signupEmail" placeholder="you@hospital.com" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="employeeId">Employee ID</label>
+            <input type="text" id="employeeId" placeholder="EMP123" required>
+          </div>
+          <div class="form-group">
+            <label for="signupPassword">Password</label>
+            <input type="password" id="signupPassword" placeholder="••••••••" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-login" id="signupBtn">
+          <span id="signupBtnText">Create Account</span>
+          <span id="signupBtnLoader" class="hidden">Creating account...</span>
+        </button>
+      </form>
+
+      <!-- Toggle Link -->
+      <div class="auth-footer">
+        <p id="toggleText">Don't have an account? <a href="#" onclick="toggleAuthMode(event)">Sign up</a></p>
+      </div>
+
+      <!-- Message -->
+      <p id="result" class="message"></p>
+    </div>
+
+  </div>
+
+  <script src="login.js"></script>
+</body>
+
+</html>

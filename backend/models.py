@@ -35,12 +35,24 @@ class Item(BaseModel):
     supplier: str
 
 class Order(BaseModel):
-    item_name: str
-    quantity: int
+    items: list[dict] # [{name: str, quantity: int}]
+    urgency: str = "Normal" # Normal, Urgent
     ordered_by: str
     ordered_by_id: Optional[str] = None
     department: str
+    ward: Optional[str] = "General"
     status: str = "pending"  # pending, approved, delivered, cancelled
+    created_at: Optional[datetime] = None
+
+class SpecimenContainer(BaseModel):
+    name: str
+    barcode_number: Optional[str] = None
+    barcode_image: Optional[str] = None
+
+class UserProfileUpdate(BaseModel):
+    full_name: str
+    department: str
+    ward: str
 
 class CancelRequest(BaseModel):
     order_id: str

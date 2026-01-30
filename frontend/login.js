@@ -7,7 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// State
+// Configuration
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:8000'
+  : 'https://ims-ia4p.onrender.com';
+
 let currentLoginType = 'user';
 let isSignupMode = false;
 
@@ -79,7 +83,7 @@ async function handleLogin(event) {
   result.className = 'message';
 
   try {
-    const response = await fetch(`https://ims-ia4p.onrender.com/login/${currentLoginType}`, {
+    const response = await fetch(`${API_BASE_URL}/login/${currentLoginType}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
@@ -137,7 +141,7 @@ async function handleSignup(event) {
   result.className = 'message';
 
   try {
-    const response = await fetch(`https://ims-ia4p.onrender.com/create-user`, {
+    const response = await fetch(`${API_BASE_URL}/create-user`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

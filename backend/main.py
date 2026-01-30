@@ -5,11 +5,12 @@ from database import (
     supabase,
     TABLE_USERS, TABLE_ADMINS, TABLE_ITEMS, TABLE_ORDERS,
     TABLE_CANCEL_REQUESTS, TABLE_DELIVERY_PERSONNEL,
-    TABLE_DISTRIBUTION_HISTORY, TABLE_AUDIT_LOGS
+    TABLE_DISTRIBUTION_HISTORY, TABLE_AUDIT_LOGS, TABLE_SPECIMEN_CONTAINERS
 )
 from models import (
     LoginRequest, UserCreate, AdminCreate, AdminProfileUpdate,
-    Item, Order, CancelRequest, DeliveryPerson, Distribution
+    UserProfileUpdate, SpecimenContainer, Item, Order,
+    CancelRequest, DeliveryPerson, Distribution
 )
 from auth import hash_password, verify_password, create_access_token
 
@@ -42,10 +43,35 @@ def create_user(user: UserCreate):
         "role": user.role,
         "status": "pending",
         "first_name": user.first_name,
-        "last_name": user.last_name
+        "last_name": user.last_name,
+        "full_name": f"{user.first_name} {user.last_name}",
+        "profile_completed": False
     }
     supabase.table(TABLE_USERS).insert(data).execute()
     return {"message": "User created successfully"}
+
+@app.get("/user/profile/{user_id}")
+def get_user_profile(user_id: str):
+    res = supabase.table(TABLE_USERS).select("*").eq("id", user_id).execute()
+    if not res.data:
+        raise HTTPException(status_code=404, detail="User not found")
+    user = res.data[0]
+    if "password_hash" in user: del user["password_hash"]
+    return user
+
+@app.put("/user/profile/{user_id}")
+def update_user_profile(user_id: str, profile: UserProfileUpdate):
+    update_data = profile.dict()
+    update_data["profile_completed"] = True
+    res = supabase.table(TABLE_USERS).update(update_data).eq("id", user_id).execute()
+    if not res.data:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"message": "Profile updated successfully"}
+
+@app.get("/user/containers")
+def get_containers():
+    res = supabase.table(TABLE_SPECIMEN_CONTAINERS).select("*").execute()
+    return res.data
 
 @app.post("/create-admin")
 def create_admin(admin: AdminCreate):
@@ -369,30 +395,53 @@ def get_user_requests(user_id: str):
 
 @app.post("/user/requests")
 def create_user_request(order: Order):
-    # Check current stock
-    res = supabase.table(TABLE_ITEMS).select("*").eq("name", order.item_name).execute()
-    if not res.data:
-        raise HTTPException(status_code=404, detail="Item not found")
-    
-    item = res.data[0]
-    if item["quantity"] < order.quantity:
-        raise HTTPException(status_code=400, detail="Insufficient stock")
-
-    # Create request
+    # Proceed with order
     order_dict = order.dict()
     order_dict["status"] = "pending"
+    order_dict["created_at"] = datetime.utcnow().isoformat()
+
+    # Backward compatibility for legacy item_name and quantity columns
+    if order.items:
+        first_item = order.items[0]
+        other_count = len(order.items) - 1
+        summary = first_item.get("name", "Unknown")
+        if other_count > 0:
+            summary += f" + {other_count} more"
+        order_dict["item_name"] = summary
+        order_dict["quantity"] = sum(i.get("quantity", 0) for i in order.items)
     
     ins_res = supabase.table(TABLE_ORDERS).insert(order_dict).execute()
     
-    # Deduct Stock immediately
-    supabase.table(TABLE_ITEMS).update({"quantity": item["quantity"] - order.quantity}).eq("name", order.item_name).execute()
-
     # Log the request
     supabase.table(TABLE_AUDIT_LOGS).insert({
         "actor_type": "user",
         "actor_id": order_dict.get("ordered_by_id", "unknown"),
         "action": "created_request",
-        "details": f"{order.quantity} of {order.item_name}"
+        "details": f"Multi-item order: {len(order.items)} items, Urgency: {order.urgency}"
     }).execute()
     
-    return {"message": "Request submitted and stock reserved", "id": str(ins_res.data[0]["id"] if ins_res.data else "unknown")}
+    return {"message": "Request submitted successfully", "id": str(ins_res.data[0]["id"] if ins_res.data else "unknown")}
+
+@app.post("/user/requests/{order_id}/cancel")
+def cancel_user_request(order_id: int):
+    # Fetch order to check status
+    res = supabase.table(TABLE_ORDERS).select("*").eq("id", order_id).execute()
+    if not res.data:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    order = res.data[0]
+    if order["status"] != "pending":
+        raise HTTPException(status_code=400, detail="Cannot cancel order that is not pending")
+    
+    # Update status to cancelled
+    supabase.table(TABLE_ORDERS).update({"status": "cancelled"}).eq("id", order_id).execute()
+    
+    # Log the cancellation
+    supabase.table(TABLE_AUDIT_LOGS).insert({
+        "actor_type": "user",
+        "actor_id": order.get("ordered_by_id", "unknown"),
+        "action": "cancelled_request",
+        "details": f"Order ID: {order_id} cancelled by user"
+    }).execute()
+    
+    return {"message": "Request cancelled successfully"}

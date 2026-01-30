@@ -6,10 +6,11 @@ const translations = {
         'nav.inventory': 'Inventory',
         'nav.approvals': 'Approvals',
         'nav.delivery': 'Delivery',
-        'nav.history': 'History',
+        'nav.history': 'Request History',
         'nav.logs': 'Logs',
         'nav.profile': 'Profile',
         'nav.new_request': 'New Request',
+        'label.ward_portal': 'Ward Portal',
 
         // Dashboard Cards
         'card.pending_approvals': 'Pending User Approvals',
@@ -54,6 +55,7 @@ const translations = {
         'label.delivered_by': 'Delivered By',
         'label.destination': 'Destination',
         'label.notes': 'Notes',
+        'label.loading': 'Loading...',
 
         // Table Headers
         'th.item': 'Item',
@@ -95,7 +97,46 @@ const translations = {
 
         // Personnel Status
         'p_status.available': 'Available',
-        'p_status.on_delivery': 'On Delivery'
+        'p_status.on_delivery': 'On Delivery',
+
+        // Order Flow
+        'order.header.title': 'Collection Containers',
+        'order.header.subtitle': 'Choose your items and specify quantities below',
+        'order.urgency.label': 'Urgency Level',
+        'urgency.normal': 'Normal',
+        'urgency.urgent': 'Urgent',
+        'btn.generate_summary': 'Generate Order Summary',
+        'order.summary.title': 'Review Your Request',
+        'label.units': 'units',
+        'order.summary.total_qty': 'Total Quantity',
+        'order.summary.priority': 'Priority:',
+        'btn.confirm_submit': 'Confirm & Submit to Lab',
+        'msg.select_item': 'Please select at least one item.',
+        'error.load_containers': 'Error loading containers:',
+        'btn.cancel': 'Cancel Request',
+        'msg.cancel_confirm': 'Are you sure you want to cancel this request?',
+        'msg.cancel_success': 'Request cancelled successfully!',
+        'error.cancel_fail': 'Failed to cancel request:',
+
+        // Containers (Dynamic Data)
+        'Blood Collection Tube (EDTA)': 'Blood Collection Tube (EDTA)',
+        'Blood Collection Tube (SST)': 'Blood Collection Tube (SST)',
+        'Urine Container (24-hour)': 'Urine Container (24-hour)',
+        'Stool Sample Container': 'Stool Sample Container',
+        'Sputum Container': 'Sputum Container',
+        'Swab (Throat)': 'Swab (Throat)',
+        'Swab (Nasal)': 'Swab (Nasal)',
+        'Synovial Fluid Container': 'Synovial Fluid Container',
+        'CSF Container': 'CSF Container',
+        'Sterile Urine Cup': 'Sterile Urine Cup',
+
+        // History & Submission
+        'th.history_summary': 'Summary',
+        'th.history_items': 'Items',
+        'msg.history_empty': 'No request history (0)',
+        'label.order_id': 'Order #',
+        'msg.submit_success': 'Multi-item request submitted successfully!',
+        'error.submit_fail': 'Error submitting request:'
     },
     jp: {
         // Navigation
@@ -104,10 +145,11 @@ const translations = {
         'nav.inventory': '在庫管理',
         'nav.approvals': '承認待ち',
         'nav.delivery': '配送担当',
-        'nav.history': '履歴',
+        'nav.history': 'リクエスト履歴',
         'nav.logs': 'ログ',
         'nav.profile': 'プロフィール',
         'nav.new_request': '新規リクエスト',
+        'label.ward_portal': '病棟ポータル',
 
         // Dashboard Cards
         'card.pending_approvals': '承認待ちユーザー',
@@ -126,6 +168,7 @@ const translations = {
         'status.in_stock': '在庫あり',
         'status.active': '有効',
         'status.rejected': '却下',
+        'status.cancelled': 'キャンセル済み',
 
         // Headers & Labels
         'header.dashboard': 'ダッシュボード',
@@ -152,6 +195,7 @@ const translations = {
         'label.delivered_by': '配送担当者',
         'label.destination': '配送先',
         'label.notes': '備考',
+        'label.loading': '読み込み中...',
 
         // Table Headers
         'th.item': '品目',
@@ -190,10 +234,49 @@ const translations = {
         'btn.mark_completed': '完了とする',
         'btn.send_delivery': '配送へ回す',
         'btn.record_manual': '手動リクエスト記録',
+        'btn.cancel': 'キャンセル',
 
         // Personnel Status
         'p_status.available': '待機中',
-        'p_status.on_delivery': '配送中'
+        'p_status.on_delivery': '配送中',
+
+        // Order Flow
+        'order.header.title': '検体容器',
+        'order.header.subtitle': '項目を選択し、数量を指定してください。',
+        'order.urgency.label': '緊急度',
+        'urgency.normal': '通常',
+        'urgency.urgent': '緊急',
+        'btn.generate_summary': '注文サマリーを作成',
+        'order.summary.title': '注文内容の確認',
+        'label.units': '個',
+        'order.summary.total_qty': '合計数量',
+        'order.summary.priority': '優先度:',
+        'btn.confirm_submit': '確定してラボに送信',
+        'msg.select_item': '少なくとも1つのアイテムを選択してください。',
+        'error.load_containers': '容器の読み込みエラー:',
+
+        // Containers (Dynamic Data)
+        'Blood Collection Tube (EDTA)': '採血管 (EDTA)',
+        'Blood Collection Tube (SST)': '採血管 (SST)',
+        'Urine Container (24-hour)': '蓄尿容器 (24時間)',
+        'Stool Sample Container': '検便容器',
+        'Sputum Container': '喀痰容器',
+        'Swab (Throat)': 'スワブ (咽頭)',
+        'Swab (Nasal)': 'スワブ (鼻腔)',
+        'Synovial Fluid Container': '関節液容器',
+        'CSF Container': '髄液容器',
+        'Sterile Urine Cup': '滅菌尿カップ',
+
+        // History & Submission
+        'th.history_summary': '概要',
+        'th.history_items': '品目',
+        'msg.history_empty': 'リクエスト履歴はありません (0)',
+        'label.order_id': '注文 #',
+        'msg.submit_success': 'リクエストを送信しました！',
+        'error.submit_fail': 'リクエスト送信エラー:',
+        'msg.cancel_confirm': 'このリクエストをキャンセルしてもよろしいですか？',
+        'msg.cancel_success': 'リクエストをキャンセルしました',
+        'error.cancel_fail': 'キャルセルに失敗しました:'
     }
 };
 

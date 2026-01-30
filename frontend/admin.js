@@ -1,9 +1,7 @@
 /* ===================================
    Configuration
    =================================== */
-const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://localhost:8000'
-  : 'https://ims-ia4p.onrender.com';
+const API_BASE_URL = 'http://localhost:8000';
 
 /* ===================================
    Initialization
@@ -242,17 +240,18 @@ async function loadOrders(filter = 'all') {
     </div>
     <div class="table-container">
       <table>
-        <thead><tr><th>${t('th.item')}</th><th>${t('th.qty')}</th><th>${t('th.requested_by')}</th><th>${t('th.ward')}</th><th>Rider</th><th>${t('th.status')}</th><th>${t('th.actions')}</th></tr></thead>
+        <thead><tr><th>Order ID</th><th>${t('th.item')}</th><th>${t('th.qty')}</th><th>${t('th.requested_by')}</th><th>${t('th.ward')}</th><th>Urgency</th><th>Rider</th><th>${t('th.status')}</th><th>${t('th.actions')}</th></tr></thead>
         <tbody>
   `;
 
   if (filtered.length === 0) {
-    html += '<tr><td colspan="7" style="text-align:center;color:#6b7280">No orders found</td></tr>';
+    html += '<tr><td colspan="9" style="text-align:center;color:#6b7280">No orders found</td></tr>';
   }
 
   filtered.forEach(o => {
     const statusClass = o.status === 'completed' ? 'active' : o.status === 'out_for_delivery' ? 'info' : 'warning';
     const riderName = o.assigned_rider || '-';
+    const urgencyBadge = o.urgency === 'Urgent' ? '<span class="badge" style="background:#dc2626;color:white;">Urgent</span>' : '<span class="badge" style="background:#d1d5db;">Normal</span>';
     const actions = o.status === 'pending' ? `
       <button class="btn-sm btn-approve" onclick="updateOrderStatus('${o.id}', 'out_for_delivery')">Dispatch</button>
     ` : o.status === 'out_for_delivery' ? `
@@ -260,10 +259,12 @@ async function loadOrders(filter = 'all') {
     ` : '-';
 
     html += `<tr>
+      <td>#${o.id}</td>
       <td>${o.item_name}</td>
       <td>${o.quantity}</td>
       <td>${o.ordered_by}</td>
       <td>${o.department}</td>
+      <td>${urgencyBadge}</td>
       <td>${riderName}</td>
       <td><span class="badge ${statusClass}">${t('status.' + o.status)}</span></td>
       <td>${actions}</td>
@@ -298,17 +299,18 @@ function loadOrdersFiltered(filter, filtered) {
     </div>
     <div class="table-container">
       <table>
-        <thead><tr><th>Item</th><th>Qty</th><th>Ordered By</th><th>Department</th><th>Rider</th><th>Status</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Order ID</th><th>Item</th><th>Qty</th><th>Ordered By</th><th>Department</th><th>Urgency</th><th>Rider</th><th>Status</th><th>Actions</th></tr></thead>
         <tbody>
   `;
 
   if (filtered.length === 0) {
-    html += '<tr><td colspan="7" style="text-align:center;color:#6b7280">No orders found</td></tr>';
+    html += '<tr><td colspan="9" style="text-align:center;color:#6b7280">No orders found</td></tr>';
   }
 
   filtered.forEach(o => {
     const statusClass = o.status === 'completed' ? 'active' : o.status === 'out_for_delivery' ? 'info' : 'warning';
     const riderName = o.assigned_rider || '-';
+    const urgencyBadge = o.urgency === 'Urgent' ? '<span class="badge" style="background:#dc2626;color:white;">Urgent</span>' : '<span class="badge" style="background:#d1d5db;">Normal</span>';
     const actions = o.status === 'pending' ? `
       <button class="btn-sm btn-approve" onclick="updateOrderStatus('${o.id}', 'out_for_delivery')">Dispatch</button>
     ` : o.status === 'out_for_delivery' ? `
@@ -316,10 +318,12 @@ function loadOrdersFiltered(filter, filtered) {
     ` : '-';
 
     html += `<tr>
+      <td>#${o.id}</td>
       <td>${o.item_name}</td>
       <td>${o.quantity}</td>
       <td>${o.ordered_by}</td>
       <td>${o.department}</td>
+      <td>${urgencyBadge}</td>
       <td>${riderName}</td>
       <td><span class="badge ${statusClass}">${o.status}</span></td>
       <td>${actions}</td>
@@ -375,7 +379,7 @@ async function loadStock() {
     </div>
     <div class="table-container">
       <table>
-        <thead><tr><th>${t('th.name')}</th><th>${t('th.category')}</th><th>${t('th.qty')}</th><th>${t('th.unit')}</th><th>${t('th.min_stock')}</th><th>${t('th.supplier')}</th><th>${t('th.status')}</th></tr></thead>
+        <thead><tr><th>${t('th.name')}</th><th>${t('th.category')}</th><th>${t('th.qty')}</th><th>${t('th.unit')}</th><th>${t('th.min_stock')}</th><th>${t('th.supplier')}</th><th>${t('th.status')}</th><th>Actions</th></tr></thead>
         <tbody>
   `;
 
@@ -389,11 +393,24 @@ async function loadStock() {
       <td>${i.min_stock}</td>
       <td>${i.supplier}</td>
       <td>${status}</td>
+      <td><button class="btn-sm btn-approve" onclick="restockItem(${i.id}, '${i.name}')">+ Restock</button></td>
     </tr>`;
   });
 
   html += '</tbody></table></div>';
   document.getElementById('contentArea').innerHTML = html;
+}
+
+async function restockItem(itemId, itemName) {
+  const qty = parseInt(prompt(`Add quantity to "${itemName}":`), 10);
+  if (isNaN(qty) || qty <= 0) {
+    alert('Please enter a valid quantity');
+    return;
+  }
+
+  await api(`/admin/inventory/${itemId}/restock?quantity=${qty}`, 'PUT');
+  alert(`Added ${qty} units to ${itemName}`);
+  loadStock();
 }
 
 async function addItem() {
@@ -559,13 +576,15 @@ async function loadDistributions() {
       <div class="section-header">${dest}</div>
       <div class="table-container" style="margin-bottom: 24px;">
         <table>
-          <thead><tr><th>${t('th.item')}</th><th>${t('th.qty')}</th><th>${t('th.delivered_by')}</th><th>${t('th.notes')}</th></tr></thead>
+          <thead><tr><th>${t('th.item')}</th><th>${t('th.qty')}</th><th>Ordered By</th><th>Date</th><th>${t('th.delivered_by')}</th><th>${t('th.notes')}</th></tr></thead>
           <tbody>
     `;
     grouped[dest].forEach(d => {
       html += `<tr>
         <td>${d.item_name}</td>
         <td>${d.quantity}</td>
+        <td>${d.ordered_by || '-'}</td>
+        <td>${d.timestamp ? new Date(d.timestamp).toLocaleString() : '-'}</td>
         <td>${d.delivered_by}</td>
         <td>${d.notes || '-'}</td>
       </tr>`;

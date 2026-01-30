@@ -136,7 +136,20 @@ const translations = {
         'msg.history_empty': 'No request history (0)',
         'label.order_id': 'Order #',
         'msg.submit_success': 'Multi-item request submitted successfully!',
-        'error.submit_fail': 'Error submitting request:'
+        'error.submit_fail': 'Error submitting request:',
+
+        // Profile
+        'profile.title': 'My Profile',
+        'profile.update_title': 'Update Profile',
+        'profile.employee_id': 'Employee ID',
+        'profile.first_name': 'First Name',
+        'profile.last_name': 'Last Name',
+        'profile.department': 'Department',
+        'profile.ward': 'Ward',
+        'profile.phone': 'Phone',
+        'profile.save': 'Save Changes',
+        'profile.success': 'Profile updated successfully!',
+        'profile.error': 'Error updating profile:'
     },
     jp: {
         // Navigation
@@ -276,7 +289,20 @@ const translations = {
         'error.submit_fail': 'リクエスト送信エラー:',
         'msg.cancel_confirm': 'このリクエストをキャンセルしてもよろしいですか？',
         'msg.cancel_success': 'リクエストをキャンセルしました',
-        'error.cancel_fail': 'キャルセルに失敗しました:'
+        'error.cancel_fail': 'キャルセルに失敗しました:',
+
+        // Profile
+        'profile.title': 'マイプロフィール',
+        'profile.update_title': 'プロフィール更新',
+        'profile.employee_id': '社員番号',
+        'profile.first_name': '名',
+        'profile.last_name': '姓',
+        'profile.department': '部署',
+        'profile.ward': '病棟',
+        'profile.phone': '電話番号',
+        'profile.save': '変更を保存',
+        'profile.success': 'プロフィールを更新しました！',
+        'profile.error': 'プロフィール更新エラー:'
     }
 };
 

@@ -1201,3 +1201,7 @@ tr:hover td {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Fix for nav-links */
+.nav-links { flex-shrink: 1 !important; }
+.nav-btn { white-space: nowrap; flex-shrink: 0; }

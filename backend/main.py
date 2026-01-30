@@ -63,6 +63,9 @@ def get_user_profile(user_id: str):
 def update_user_profile(user_id: str, profile: UserProfileUpdate):
     update_data = profile.dict()
     update_data["profile_completed"] = True
+    if profile.first_name and profile.last_name:
+        update_data["full_name"] = f"{profile.first_name} {profile.last_name}"
+    
     res = supabase.table(TABLE_USERS).update(update_data).eq("id", user_id).execute()
     if not res.data:
         raise HTTPException(status_code=404, detail="User not found")
@@ -211,6 +214,19 @@ def add_item(item: Item):
     supabase.table(TABLE_ITEMS).insert(item.dict()).execute()
     return {"message": "Item added successfully"}
 
+@app.put("/admin/inventory/{item_id}/restock")
+def restock_item(item_id: int, quantity: int):
+    # Get current quantity
+    res = supabase.table(TABLE_ITEMS).select("quantity").eq("id", item_id).execute()
+    if not res.data:
+        raise HTTPException(status_code=404, detail="Item not found")
+    
+    current_qty = res.data[0]["quantity"] or 0
+    new_qty = current_qty + quantity
+    
+    supabase.table(TABLE_ITEMS).update({"quantity": new_qty}).eq("id", item_id).execute()
+    return {"message": f"Restocked successfully. New quantity: {new_qty}"}
+
 # -------------------------
 # ORDERS
 # -------------------------
@@ -233,11 +249,20 @@ def create_order(order: Order):
 
     # Proceed with order
     order_data = order.dict()
-    supabase.table(TABLE_ORDERS).insert(order_data).execute()
+    ins_res = supabase.table(TABLE_ORDERS).insert(order_data).execute()
 
     # Deduct stock
     new_qty = item["quantity"] - order.quantity
     supabase.table(TABLE_ITEMS).update({"quantity": new_qty}).eq("name", order.item_name).execute()
+
+    # Log order creation
+    order_id = ins_res.data[0]["id"] if ins_res.data else "unknown"
+    supabase.table(TABLE_AUDIT_LOGS).insert({
+        "actor_type": "admin",
+        "actor_id": "system",
+        "action": "order_created",
+        "details": f"Order #{order_id} created. Item: {order.item_name}, Qty: {order.quantity}"
+    }).execute()
 
     return {"message": "Order created and stock updated"}
 
@@ -250,6 +275,19 @@ def update_order_status(order_id: int, status: str):
 
     # Automated Rider Assignment on Dispatch
     if status == "out_for_delivery":
+        # REDUCE INVENTORY FIRST
+        items = order.get("items") or [{"name": order.get("item_name"), "quantity": order.get("quantity")}]
+        for it in items:
+            name = it.get("name")
+            qty = it.get("quantity")
+            if name and qty:
+                stock_res = supabase.table(TABLE_ITEMS).select("id, quantity").eq("name", name).execute()
+                if stock_res.data:
+                    item_id = stock_res.data[0]["id"]
+                    current_qty = stock_res.data[0]["quantity"]
+                    new_qty = current_qty - qty
+                    supabase.table(TABLE_ITEMS).update({"quantity": new_qty}).eq("id", item_id).execute()
+
         # Find first available rider
         rider_res = supabase.table(TABLE_DELIVERY_PERSONNEL).select("*").eq("status", "available").limit(1).execute()
         if not rider_res.data:
@@ -267,14 +305,43 @@ def update_order_status(order_id: int, status: str):
         # Update rider status
         supabase.table(TABLE_DELIVERY_PERSONNEL).update({"status": "on_delivery"}).eq("id", rider["id"]).execute()
         
+        # LOG THE DISPATCH
+        supabase.table(TABLE_AUDIT_LOGS).insert({
+            "actor_type": "admin",
+            "actor_id": "system",
+            "action": "order_dispatched",
+            "details": f"Order #{order_id} dispatched. Delivered by: {rider['name']}"
+        }).execute()
+        
         return {"message": f"Order dispatched and assigned to {rider['name']}"}
 
     # Release Rider on Completion
     elif status == "completed":
         supabase.table(TABLE_ORDERS).update({"status": status}).eq("id", order_id).execute()
         
+        rider_name = order.get("assigned_rider", "Unknown")
         if order.get("rider_id"):
             supabase.table(TABLE_DELIVERY_PERSONNEL).update({"status": "available"}).eq("id", int(order["rider_id"])).execute()
+        
+        # Log order completion
+        supabase.table(TABLE_AUDIT_LOGS).insert({
+            "actor_type": "admin",
+            "actor_id": "system",
+            "action": "order_completed",
+            "details": f"Order #{order_id} completed. Delivered by: {rider_name}"
+        }).execute()
+
+        # Record in Distribution History
+        dist_data = {
+            "item_name": order.get("item_name", "Unknown"),
+            "quantity": order.get("quantity", 0),
+            "destination": order.get("department", "Unknown"),
+            "delivered_by": rider_name,
+            "ordered_by": order.get("ordered_by", "Unknown"),
+            "timestamp": datetime.utcnow().isoformat(),
+            "notes": f"Order #{order_id}"
+        }
+        supabase.table(TABLE_DISTRIBUTION_HISTORY).insert(dist_data).execute()
         
         return {"message": "Order completed and rider released"}
 
@@ -395,6 +462,21 @@ def get_user_requests(user_id: str):
 
 @app.post("/user/requests")
 def create_user_request(order: Order):
+    # CHECK STOCK AVAILABILITY FIRST
+    if order.items:
+        for item in order.items:
+            name = item.get("name")
+            requested_qty = item.get("quantity", 0)
+            if name and requested_qty > 0:
+                stock_res = supabase.table(TABLE_ITEMS).select("quantity").eq("name", name).execute()
+                if stock_res.data:
+                    available = stock_res.data[0]["quantity"] or 0
+                    if requested_qty > available:
+                        raise HTTPException(
+                            status_code=400, 
+                            detail=f"Insufficient stock for '{name}'. Requested: {requested_qty}, Available: {available}"
+                        )
+
     # Proceed with order
     order_dict = order.dict()
     order_dict["status"] = "pending"

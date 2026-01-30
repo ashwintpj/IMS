@@ -1,9 +1,7 @@
 /* ===================================
    Configuration & State
    =================================== */
-const API_BASE_URL = !window.location.hostname || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://localhost:8000'
-  : 'https://ims-ia4p.onrender.com';
+const API_BASE_URL = 'http://localhost:8000';
 let currentUser = {
   id: '',
   name: 'Ward Staff',
@@ -26,6 +24,25 @@ document.addEventListener('DOMContentLoaded', () => {
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
     currentUser.id = payload.sub;
+
+    // Fetch Profile to get Name
+    fetch(`${API_BASE_URL}/user/profile/${currentUser.id}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(profile => {
+        if (profile.first_name && profile.last_name) {
+          currentUser.name = `${profile.first_name} ${profile.last_name}`;
+          // Update Header Name
+          const userNameEl = document.getElementById('userName');
+          if (userNameEl) userNameEl.innerText = currentUser.name;
+          // Also update department/ward defaults if needed, but handled in submit
+          currentUser.department = profile.department;
+          currentUser.ward = profile.ward;
+        }
+      })
+      .catch(console.error);
+
   } catch (e) {
     console.error('Invalid token', e);
     logout();
@@ -82,7 +99,8 @@ function showSection(sectionId) {
   const titles = {
     'dashboard': t('header.ward_dashboard'),
     'new-request': t('nav.new_request'),
-    'history': t('nav.history')
+    'history': t('nav.history'),
+    'profile': 'My Profile'
   };
   document.getElementById('pageTitle').innerText = titles[sectionId];
   document.getElementById('contentArea').innerHTML = `<p>${t('label.loading')}</p>`;
@@ -91,6 +109,7 @@ function showSection(sectionId) {
     case 'dashboard': loadDashboard(); break;
     case 'new-request': loadNewRequestForm(); break;
     case 'history': loadHistory(); break;
+    case 'profile': loadProfile(); break;
   }
 }
 
@@ -109,7 +128,9 @@ async function api(endpoint, method = 'GET', body = null) {
   const res = await fetch(`${API_BASE_URL}${endpoint}`, options);
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.detail || err.message || `API Error ${res.status}`);
+    let msg = err.detail || err.message || `API Error ${res.status}`;
+    if (typeof msg === 'object') msg = JSON.stringify(msg);
+    throw new Error(msg);
   }
   return res.json();
 }
@@ -216,7 +237,7 @@ async function loadNewRequestForm() {
           ${gridHtml}
         </div>
 
-        <div class="flow-controls">
+        <div class="flow-controls" style="text-align: center;">
           <div class="urgency-selector">
             <label class="urgency-label">${t('order.urgency.label')}</label>
             <div class="urgency-options">
@@ -225,7 +246,7 @@ async function loadNewRequestForm() {
             </div>
           </div>
 
-          <button class="btn-primary" style="padding: 16px; font-weight: 700; border-radius: 12px;" onclick="prepareOrderSummary()">${t('btn.generate_summary')}</button>
+          <button class="btn-primary" style="padding: 16px; font-weight: 700; border-radius: 12px; margin: 20px auto; display: block;" onclick="prepareOrderSummary()">${t('btn.generate_summary')}</button>
           
           <div id="orderSummarySection"></div>
         </div>
@@ -329,7 +350,7 @@ async function submitMultiRequest() {
   const body = {
     items: itemsList,
     urgency: currentUrgency,
-    ordered_by: currentUser.name,
+    ordered_by: (profile.first_name && profile.last_name) ? `${profile.first_name} ${profile.last_name}` : currentUser.name,
     ordered_by_id: currentUser.id,
     department: profile.department || 'Ward Staff',
     ward: profile.ward || 'General',
@@ -342,7 +363,9 @@ async function submitMultiRequest() {
     currentOrderItems = {};
     showSection('history');
   } catch (err) {
-    alert(t('error.submit_fail') + ' ' + (err.detail || 'Connection error'));
+    // Show detailed stock error
+    const message = err.message || err.detail || 'Connection error';
+    alert('⚠️ ' + message);
   }
 }
 
@@ -396,5 +419,77 @@ async function cancelRequest(orderId) {
     loadHistory();
   } catch (err) {
     alert(t('error.cancel_fail') + ' ' + err.message);
+  }
+}
+
+/* ===================================
+   Profile Management
+   =================================== */
+async function loadProfile() {
+  try {
+    const profile = await api(`/user/profile/${currentUser.id}`);
+
+    document.getElementById('contentArea').innerHTML = `
+      <div class="profile-container" style="max-width: 600px; margin: 0 auto;">
+        <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 16px; margin-bottom: 24px;">
+          <h2 style="margin: 0 0 8px 0;">${profile.full_name || profile.first_name + ' ' + profile.last_name}</h2>
+          <p style="margin: 0; opacity: 0.9;">${profile.email}</p>
+          <p style="margin: 8px 0 0 0; opacity: 0.8;">${t('profile.employee_id')}: ${profile.employee_id}</p>
+        </div>
+        
+        <div class="card" style="background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+          <h3 style="margin: 0 0 20px 0; color: #1f2937;">${t('profile.update_title')}</h3>
+          
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #374151;">${t('profile.first_name')}</label>
+            <input type="text" id="profile_first_name" value="${profile.first_name || ''}" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+          </div>
+          
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #374151;">${t('profile.last_name')}</label>
+            <input type="text" id="profile_last_name" value="${profile.last_name || ''}" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+          </div>
+          
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #374151;">${t('profile.department')}</label>
+            <input type="text" id="profile_department" value="${profile.department || ''}" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+          </div>
+          
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #374151;">${t('profile.ward')}</label>
+            <input type="text" id="profile_ward" value="${profile.ward || ''}" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+          </div>
+          
+          <div style="margin-bottom: 24px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #374151;">${t('profile.phone')}</label>
+            <input type="text" id="profile_phone" value="${profile.phone || ''}" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+          </div>
+          
+          <button onclick="updateProfile()" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 16px; cursor: pointer;">
+            ${t('profile.save')}
+          </button>
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    document.getElementById('contentArea').innerHTML = `<p style="color: red;">${t('profile.error')} ${err.message}</p>`;
+  }
+}
+
+async function updateProfile() {
+  const data = {
+    first_name: document.getElementById('profile_first_name').value,
+    last_name: document.getElementById('profile_last_name').value,
+    department: document.getElementById('profile_department').value,
+    ward: document.getElementById('profile_ward').value,
+    phone: document.getElementById('profile_phone').value
+  };
+
+  try {
+    await api(`/user/profile/${currentUser.id}`, 'PUT', data);
+    alert(t('profile.success'));
+    loadProfile();
+  } catch (err) {
+    alert(t('profile.error') + ' ' + err.message);
   }
 }

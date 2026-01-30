@@ -50,9 +50,12 @@ class SpecimenContainer(BaseModel):
     barcode_image: Optional[str] = None
 
 class UserProfileUpdate(BaseModel):
-    full_name: str
+    first_name: str
+    last_name: str
+    full_name: Optional[str] = None
     department: str
     ward: str
+    phone: Optional[str] = None
 
 class CancelRequest(BaseModel):
     order_id: str
@@ -71,4 +74,6 @@ class Distribution(BaseModel):
     quantity: int
     destination: str
     delivered_by: str
+    ordered_by: Optional[str] = "Unknown"
+    timestamp: Optional[datetime] = None
     notes: Optional[str] = None

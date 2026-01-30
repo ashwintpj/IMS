@@ -2,6 +2,7 @@
    Configuration
    =================================== */
 const API_BASE_URL = 'https://ims-ia4p.onrender.com';
+let currentAdminId = '';
 
 /* ===================================
    Initialization
@@ -13,6 +14,15 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!token || userType !== 'admin') {
     window.location.replace('index.html');
     return;
+  }
+
+  // Decode token
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    currentAdminId = payload.sub;
+  } catch (e) {
+    console.error('Invalid token', e);
+    logout();
   }
 
   // Initial Load
@@ -180,34 +190,52 @@ async function loadDashboard() {
    Profile - Editable
    =================================== */
 async function loadProfile() {
-  // For now, show editable form with placeholder data
-  document.getElementById('contentArea').innerHTML = `
-    <div class="card profile-card">
-      <h3>Edit Profile</h3>
-      <form onsubmit="saveProfile(event)">
-        <div class="form-row">
-          <div class="form-group">
-            <label>First Name</label>
-            <input type="text" id="profileFirstName" value="Admin" required>
+  try {
+    const profile = await api(`/admin/profile/${currentAdminId}`);
+
+    document.getElementById('contentArea').innerHTML = `
+      <div class="card profile-card">
+        <h3>Edit Profile</h3>
+        <form onsubmit="saveProfile(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>First Name</label>
+              <input type="text" id="profileFirstName" value="${profile.first_name || ''}" required>
+            </div>
+            <div class="form-group">
+              <label>Last Name</label>
+              <input type="text" id="profileLastName" value="${profile.last_name || ''}" required>
+            </div>
           </div>
           <div class="form-group">
-            <label>Last Name</label>
-            <input type="text" id="profileLastName" value="User" required>
+            <label>Email</label>
+            <input type="email" id="profileEmail" value="${profile.email || ''}" required>
           </div>
-        </div>
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" id="profileEmail" value="admin@test.com" required>
-        </div>
-        <button type="submit" class="btn-primary">Save Changes</button>
-      </form>
-    </div>
-  `;
+          <button type="submit" class="btn-primary">Save Changes</button>
+        </form>
+      </div>
+    `;
+  } catch (err) {
+    document.getElementById('contentArea').innerHTML = `<p style="color:red">Error loading profile: ${err.message}</p>`;
+  }
 }
 
-function saveProfile(e) {
+async function saveProfile(e) {
   e.preventDefault();
-  alert('Profile updated successfully!');
+  const data = {
+    first_name: document.getElementById('profileFirstName').value,
+    last_name: document.getElementById('profileLastName').value,
+    email: document.getElementById('profileEmail').value
+  };
+
+  try {
+    await api(`/admin/profile/${currentAdminId}`, 'PUT', data);
+    alert('Profile updated successfully!');
+    const adminName = document.getElementById('adminName');
+    if (adminName) adminName.innerText = `${data.first_name} ${data.last_name}`;
+  } catch (err) {
+    alert('Error updating profile: ' + (err.message || 'Unknown error'));
+  }
 }
 
 /* ===================================

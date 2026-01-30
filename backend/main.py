@@ -451,21 +451,28 @@ def record_distribution(dist: Distribution):
 @app.get("/admin/analytics")
 def get_analytics():
     try:
-        # Fetch all history
-        res = supabase.table(TABLE_DISTRIBUTION_HISTORY).select("*").execute()
-        data = res.data
+        # Fetch all orders that are meaningful for analytics (completed, dispatched, delivered)
+        # We also include 'pending' maybe? User asked for USAGE. 
+        # Typically usage = dispatched/completed. 
+        # But for trends, maybe all requests?
+        # Let's stick to 'out_for_delivery' and 'completed' and 'delivered' as confirmed usage.
+        # Although 'pending' is demand.
+        # Let's fetch all non-cancelled/rejected orders.
+        res = supabase.table(TABLE_ORDERS).select("*").neq("status", "cancelled").neq("status", "rejected").execute()
+        orders = res.data
         
         # Aggregate Data
         usage_by_ward = {} # { Ward: { Item: Qty } }
         daily_trends = {}  # { Date: { Item: Qty } }
         
-        for entry in data:
-            ward = entry.get("ward") or "Unknown"
-            item = entry.get("item_name") or "Unknown"
-            qty = entry.get("quantity") or 0
+        for order in orders:
+            # Use 'department' or 'ward' column if exists. Order model has 'department'.
+            ward = order.get("department") or order.get("ward") or "Unknown"
+            item = order.get("item_name") or "Unknown"
+            qty = order.get("quantity") or 0
             
-            # Parse timestamp for daily trend
-            ts = entry.get("timestamp")
+            # Parse timestamp (created_at)
+            ts = order.get("created_at")
             date = ts[:10] if ts else "Unknown"
             
             # Aggregate by Ward
@@ -482,7 +489,6 @@ def get_analytics():
         }
     except Exception as e:
         print(f"Analytics Error: {e}")
-        # Return empty structure on error (e.g. table missing)
         return {"usage_by_ward": {}, "daily_trends": {}}
 
 # -------------------------

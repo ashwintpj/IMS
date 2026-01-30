@@ -218,6 +218,7 @@ let allOrders = [];
 async function loadOrders(filter = 'all') {
   if (filter === 'all') {
     allOrders = await api('/admin/orders');
+    allOrders.sort((a, b) => b.id - a.id);
   }
 
   const filtered = filter === 'all' ? allOrders : allOrders.filter(o => o.status === filter);

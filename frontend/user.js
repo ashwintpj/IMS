@@ -374,6 +374,7 @@ async function submitMultiRequest() {
    =================================== */
 async function loadHistory() {
   const requests = await api(`/user/requests/${currentUser.id}`);
+  requests.sort((a, b) => b.id - a.id);
 
   let html = `
     <div class="table-container">

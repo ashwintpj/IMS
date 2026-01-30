@@ -640,7 +640,7 @@ async function loadLogs() {
   logs.forEach(l => {
     html += `<tr>
       <td>${new Date(l.timestamp).toLocaleString()}</td>
-      <td>${l.actor_type}</td>
+      <td>${l.actor_type.toUpperCase()} <span style="color:#6b7280; font-size:0.9em">(${l.actor_name || 'Unknown'})</span></td>
       <td>${l.action}</td>
       <td>${l.details || '-'}</td>
     </tr>`;

@@ -444,7 +444,36 @@ def record_distribution(dist: Distribution):
 @app.get("/admin/logs")
 def get_logs():
     res = supabase.table(TABLE_AUDIT_LOGS).select("*").order("timestamp", desc=True).execute()
-    return res.data
+    logs = res.data
+
+    # Fetch users and admins for mapping names
+    try:
+        users_res = supabase.table(TABLE_USERS).select("id, first_name, last_name, full_name").execute()
+        admins_res = supabase.table(TABLE_ADMINS).select("id, first_name, last_name").execute()
+        
+        users_map = {str(u["id"]): u.get("full_name") or f"{u.get('first_name','')} {u.get('last_name','')}".strip() for u in users_res.data}
+        admins_map = {str(a["id"]): f"{a.get('first_name','')} {a.get('last_name','')}".strip() for a in admins_res.data}
+
+        for log in logs:
+            actor_id = str(log.get("actor_id"))
+            actor_type = log.get("actor_type")
+            
+            if actor_type == "user":
+                log["actor_name"] = users_map.get(actor_id, "Unknown User")
+            elif actor_type == "admin":
+                if actor_id == "system":
+                    log["actor_name"] = "System"
+                else:
+                    log["actor_name"] = admins_map.get(actor_id, "Unknown Admin")
+            else:
+                log["actor_name"] = actor_id
+                
+    except Exception as e:
+        print(f"Error enriching logs: {e}")
+        # If error (e.g. table missing), return logs as is
+        pass
+        
+    return logs
 
 # -------------------------
 # USER / WARD ENDPOINTS

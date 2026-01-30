@@ -438,35 +438,37 @@ async function loadProfile() {
           <p style="margin: 8px 0 0 0; opacity: 0.8;">${t('profile.employee_id')}: ${profile.employee_id}</p>
         </div>
         
-        <div class="card" style="background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-          <h3 style="margin: 0 0 20px 0; color: #1f2937;">${t('profile.update_title')}</h3>
+        <div class="card profile-card">
+          <h3>${t('profile.update_title')}</h3>
           
-          <div style="margin-bottom: 16px;">
-            <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #374151;">${t('profile.first_name')}</label>
-            <input type="text" id="profile_first_name" value="${profile.first_name || ''}" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+          <div class="form-row">
+            <div class="form-group">
+              <label>${t('profile.first_name')}</label>
+              <input type="text" id="profile_first_name" value="${profile.first_name || ''}">
+            </div>
+            <div class="form-group">
+              <label>${t('profile.last_name')}</label>
+              <input type="text" id="profile_last_name" value="${profile.last_name || ''}">
+            </div>
           </div>
           
-          <div style="margin-bottom: 16px;">
-            <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #374151;">${t('profile.last_name')}</label>
-            <input type="text" id="profile_last_name" value="${profile.last_name || ''}" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+          <div class="form-row">
+            <div class="form-group">
+              <label>${t('profile.department')}</label>
+              <input type="text" id="profile_department" value="${profile.department || ''}">
+            </div>
+            <div class="form-group">
+              <label>${t('profile.ward')}</label>
+              <input type="text" id="profile_ward" value="${profile.ward || ''}">
+            </div>
           </div>
           
-          <div style="margin-bottom: 16px;">
-            <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #374151;">${t('profile.department')}</label>
-            <input type="text" id="profile_department" value="${profile.department || ''}" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+          <div class="form-group">
+            <label>${t('profile.phone')}</label>
+            <input type="text" id="profile_phone" value="${profile.phone || ''}">
           </div>
           
-          <div style="margin-bottom: 16px;">
-            <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #374151;">${t('profile.ward')}</label>
-            <input type="text" id="profile_ward" value="${profile.ward || ''}" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
-          </div>
-          
-          <div style="margin-bottom: 24px;">
-            <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #374151;">${t('profile.phone')}</label>
-            <input type="text" id="profile_phone" value="${profile.phone || ''}" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
-          </div>
-          
-          <button onclick="updateProfile()" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 16px; cursor: pointer;">
+          <button onclick="updateProfile()" class="btn-primary" style="width:100%; margin-top:16px;">
             ${t('profile.save')}
           </button>
         </div>

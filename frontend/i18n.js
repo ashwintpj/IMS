@@ -149,7 +149,15 @@ const translations = {
         'profile.phone': 'Phone',
         'profile.save': 'Save Changes',
         'profile.success': 'Profile updated successfully!',
-        'profile.error': 'Error updating profile:'
+        'profile.error': 'Error updating profile:',
+        'profile.title': 'My Profile',
+        'profile.update_title': 'Update Profile',
+        'profile.employee_id': 'Employee ID',
+        'profile.first_name': 'First Name',
+        'profile.last_name': 'Last Name',
+        'profile.department': 'Department',
+        'profile.ward': 'Ward',
+        'profile.phone': 'Phone'
     },
     jp: {
         // Navigation

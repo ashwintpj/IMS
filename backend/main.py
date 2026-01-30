@@ -445,6 +445,47 @@ def record_distribution(dist: Distribution):
     return {"message": "Distribution recorded"}
 
 # -------------------------
+# ANALYTICS
+# -------------------------
+
+@app.get("/admin/analytics")
+def get_analytics():
+    try:
+        # Fetch all history
+        res = supabase.table(TABLE_DISTRIBUTION_HISTORY).select("*").execute()
+        data = res.data
+        
+        # Aggregate Data
+        usage_by_ward = {} # { Ward: { Item: Qty } }
+        daily_trends = {}  # { Date: { Item: Qty } }
+        
+        for entry in data:
+            ward = entry.get("ward") or "Unknown"
+            item = entry.get("item_name") or "Unknown"
+            qty = entry.get("quantity") or 0
+            
+            # Parse timestamp for daily trend
+            ts = entry.get("timestamp")
+            date = ts[:10] if ts else "Unknown"
+            
+            # Aggregate by Ward
+            if ward not in usage_by_ward: usage_by_ward[ward] = {}
+            usage_by_ward[ward][item] = usage_by_ward[ward].get(item, 0) + qty
+            
+            # Aggregate by Day
+            if date not in daily_trends: daily_trends[date] = {}
+            daily_trends[date][item] = daily_trends[date].get(item, 0) + qty
+            
+        return {
+            "usage_by_ward": usage_by_ward,
+            "daily_trends": daily_trends
+        }
+    except Exception as e:
+        print(f"Analytics Error: {e}")
+        # Return empty structure on error (e.g. table missing)
+        return {"usage_by_ward": {}, "daily_trends": {}}
+
+# -------------------------
 # AUDIT LOGS
 # -------------------------
 

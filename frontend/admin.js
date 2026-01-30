@@ -105,6 +105,7 @@ function showSection(sectionId) {
     case 'approvals': loadApprovals(); break;
     case 'delivery': loadDeliveryPersonnel(); break;
     case 'distributions': loadDistributions(); break;
+    case 'analytics': loadAnalytics(); break;
     case 'logs': loadLogs(); break;
   }
 }
@@ -676,4 +677,102 @@ async function loadLogs() {
 
   html += '</tbody></table></div>';
   document.getElementById('contentArea').innerHTML = html;
+}
+
+/* ===================================
+   Analytics
+   =================================== */
+async function loadAnalytics() {
+  const content = document.getElementById('contentArea');
+  content.innerHTML = `
+    <div style="display: grid; grid-template-columns: 1fr; gap: 24px;">
+      <div class="card" style="padding: 24px; border-radius: 12px; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h3 style="margin-bottom: 20px; color: #1f2937;">Inventory Usage by Ward</h3>
+        <div style="height: 400px; position: relative;">
+            <canvas id="wardChart"></canvas>
+        </div>
+      </div>
+      <div class="card" style="padding: 24px; border-radius: 12px; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h3 style="margin-bottom: 20px; color: #1f2937;">Daily Consumption Trends</h3>
+        <div style="height: 400px; position: relative;">
+            <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+    </div>
+  `;
+
+  try {
+    const data = await api('/admin/analytics');
+
+    // --- 1. Ward Chart (Stacked Bar) ---
+    const wards = Object.keys(data.usage_by_ward || {});
+    // Get all unique items
+    const allItems = new Set();
+    Object.values(data.usage_by_ward || {}).forEach(w => Object.keys(w).forEach(i => allItems.add(i)));
+    const itemsArray = Array.from(allItems);
+
+    const wardDatasets = itemsArray.map((item, index) => ({
+      label: item,
+      data: wards.map(w => (data.usage_by_ward[w] || {})[item] || 0),
+      backgroundColor: getColor(index),
+      stack: 'Stack 0'
+    }));
+
+    // Check if we have data
+    if (wards.length === 0) {
+      document.getElementById('wardChart').parentNode.innerHTML = '<p style="text-align:center; color:#6b7280; margin-top:150px;">No usage data recorded yet.</p>';
+    } else {
+      new Chart(document.getElementById('wardChart'), {
+        type: 'bar',
+        data: { labels: wards, datasets: wardDatasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'top' } },
+          scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }
+        }
+      });
+    }
+
+    // --- 2. Trend Chart (Line) ---
+    const dates = Object.keys(data.daily_trends || {}).sort();
+    const trendDatasets = itemsArray.map((item, index) => ({
+      label: item,
+      data: dates.map(d => (data.daily_trends[d] || {})[item] || 0),
+      borderColor: getColor(index),
+      backgroundColor: getColor(index),
+      fill: false,
+      tension: 0.3
+    }));
+
+    if (dates.length === 0) {
+      document.getElementById('trendChart').parentNode.innerHTML = '<p style="text-align:center; color:#6b7280; margin-top:150px;">No trend data available yet.</p>';
+    } else {
+      new Chart(document.getElementById('trendChart'), {
+        type: 'line',
+        data: { labels: dates, datasets: trendDatasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'top' } },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+    }
+
+  } catch (err) {
+    content.innerHTML = `<div style="padding:20px; color:red;">
+        <h3>Error loading analytics</h3>
+        <p>${err.message}</p>
+        <p>Please ensure you have created the <code>distribution_history</code> table in Supabase.</p>
+    </div>`;
+  }
+}
+
+function getColor(index) {
+  const colors = [
+    '#4f46e5', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6',
+    '#ec4899', '#6366f1', '#14b8a6', '#f97316', '#0ea5e9'
+  ];
+  return colors[index % colors.length];
 }

@@ -489,8 +489,13 @@ async function updateProfile() {
   try {
     await api(`/user/profile/${currentUser.id}`, 'PUT', data);
     alert(t('profile.success'));
-    loadProfile();
+
+    // Update UI directly like Admin profile
+    currentUser.name = `${data.first_name} ${data.last_name}`;
+    const headerName = document.getElementById('welcomeName');
+    if (headerName) headerName.innerText = currentUser.name;
+
   } catch (err) {
-    alert(t('profile.error') + ' ' + err.message);
+    alert(t('profile.error') + ' ' + (err.message || 'Unknown error'));
   }
 }

@@ -491,18 +491,18 @@ async function loadDeliveryPersonnel() {
     <div class="section-header">${t('p_status.available')} (${available.length})</div>
     <div class="table-container" style="margin-bottom: 24px;">
       <table>
-        <thead><tr><th>${t('th.name')}</th><th>${t('th.phone')}</th><th>${t('th.vehicle')}</th><th>${t('th.actions')}</th></tr></thead>
+        <thead><tr><th>${t('th.name')}</th><th>${t('th.phone')}</th><th>${t('th.actions')}</th></tr></thead>
         <tbody>
   `;
 
   if (available.length === 0) {
-    html += `<tr><td colspan="4" style="text-align:center;color:#6b7280">${t('p_status.available')} (0)</td></tr>`;
+    html += `<tr><td colspan="3" style="text-align:center;color:#6b7280">${t('p_status.available')} (0)</td></tr>`;
   }
   available.forEach(p => {
     html += `<tr>
       <td>${p.name}</td>
       <td>${p.phone}</td>
-      <td>${p.vehicle_number}</td>
+
       <td><button class="btn-sm btn-reject" onclick="setDeliveryStatus('${p.id}', 'on_delivery')">${t('btn.assign')}</button></td>
     </tr>`;
   });
@@ -512,18 +512,18 @@ async function loadDeliveryPersonnel() {
     <div class="section-header">${t('p_status.on_delivery')} (${assigned.length})</div>
     <div class="table-container">
       <table>
-        <thead><tr><th>${t('th.name')}</th><th>${t('th.phone')}</th><th>${t('th.vehicle')}</th><th>${t('th.actions')}</th></tr></thead>
+        <thead><tr><th>${t('th.name')}</th><th>${t('th.phone')}</th><th>${t('th.actions')}</th></tr></thead>
         <tbody>
   `;
 
   if (assigned.length === 0) {
-    html += `<tr><td colspan="4" style="text-align:center;color:#6b7280">${t('p_status.on_delivery')} (0)</td></tr>`;
+    html += `<tr><td colspan="3" style="text-align:center;color:#6b7280">${t('p_status.on_delivery')} (0)</td></tr>`;
   }
   assigned.forEach(p => {
     html += `<tr>
       <td>${p.name}</td>
       <td>${p.phone}</td>
-      <td>${p.vehicle_number}</td>
+
       <td><button class="btn-sm btn-approve" onclick="setDeliveryStatus('${p.id}', 'available')">${t('btn.unassign')}</button></td>
     </tr>`;
   });
@@ -541,7 +541,7 @@ async function addDeliveryPerson() {
   const name = prompt("Name:");
   if (!name) return;
   const phone = prompt("Phone Number:");
-  const vehicle_number = prompt("Vehicle Number:");
+  const vehicle_number = "-";
 
   await api('/admin/delivery-personnel', 'POST', { name, phone, vehicle_number, status: 'available' });
   alert('Delivery person added!');

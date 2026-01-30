@@ -61,15 +61,22 @@ def get_user_profile(user_id: str):
 
 @app.put("/user/profile/{user_id}")
 def update_user_profile(user_id: str, profile: UserProfileUpdate):
-    update_data = profile.dict()
-    update_data["profile_completed"] = True
-    if profile.first_name and profile.last_name:
-        update_data["full_name"] = f"{profile.first_name} {profile.last_name}"
-    
-    res = supabase.table(TABLE_USERS).update(update_data).eq("id", user_id).execute()
-    if not res.data:
-        raise HTTPException(status_code=404, detail="User not found")
-    return {"message": "Profile updated successfully"}
+    try:
+        update_data = profile.dict()
+        update_data["profile_completed"] = True
+        if profile.first_name and profile.last_name:
+            update_data["full_name"] = f"{profile.first_name} {profile.last_name}"
+        
+        # Remove None values
+        update_data = {k: v for k, v in update_data.items() if v is not None}
+        
+        res = supabase.table(TABLE_USERS).update(update_data).eq("id", user_id).execute()
+        if not res.data:
+            raise HTTPException(status_code=404, detail=f"User {user_id} not found")
+        return {"message": "Profile updated successfully"}
+    except Exception as e:
+        print(f"Error updating user profile {user_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/user/containers")
 def get_containers():

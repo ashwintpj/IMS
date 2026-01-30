@@ -10,6 +10,7 @@ const translations = {
         'nav.logs': 'Logs',
         'nav.profile': 'Profile',
         'nav.new_request': 'New Request',
+        'nav.analytics': 'Analytics',
         'label.ward_portal': 'Ward Portal',
 
         // Dashboard Cards
@@ -165,6 +166,7 @@ const translations = {
         'nav.requests': 'リクエスト',
         'nav.inventory': '在庫管理',
         'nav.approvals': '承認待ち',
+        'nav.analytics': '分析',
         'nav.delivery': '配送担当',
         'nav.history': 'リクエスト履歴',
         'nav.logs': 'ログ',

@@ -1,7 +1,7 @@
 /* ===================================
    Configuration & State
    =================================== */
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'https://ims-ia4p.onrender.com';
 let currentUser = {
   id: '',
   name: 'Ward Staff',

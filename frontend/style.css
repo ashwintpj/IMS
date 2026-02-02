@@ -439,7 +439,7 @@ body {
 
   /* Show Mobile Button */
   .mobile-menu-btn {
-    display: block !important;
+    display: flex !important;
     width: 40px;
     height: 40px;
   }
@@ -1500,5 +1500,63 @@ tr:hover td {
 
   .nav-user {
     display: none;
+  }
+
+  /* Order Summary Card - Mobile */
+  .order-summary-card {
+    margin: 20px 10px;
+    padding: 24px 16px;
+    border-radius: 20px;
+    max-width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+  .order-summary-card h3 {
+    font-size: 1.25rem;
+    text-align: center;
+  }
+
+  .summary-items {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .summary-item {
+    padding: 12px 16px;
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .summary-item span {
+    font-size: 0.9rem;
+  }
+
+  .summary-total {
+    font-size: 1.25rem;
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .priority-badge {
+    font-size: 0.75rem;
+    padding: 8px 12px;
+    white-space: normal;
+    word-wrap: break-word;
+    max-width: 100%;
+  }
+
+  .btn-confirm {
+    padding: 16px;
+    font-size: 1rem;
+    margin-top: 24px;
+    width: 100%;
   }
 }

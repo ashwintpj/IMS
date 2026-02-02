@@ -29,6 +29,12 @@ This project was developed as part of an internship program at Techno Project Ja
 ### System Architecture
 ![System Architecture](docs/architecture.png)
 
+### User Flow
+![User Flow](docs/user_flow.png)
+
+### Admin Flow
+![Admin Flow](docs/admin_flow.png)
+
 ### Backend
 *   **Framework**: FastAPI (Python)
 *   **Database**: Supabase (PostgreSQL)

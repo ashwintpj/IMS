@@ -9,6 +9,12 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background: #f5f7fa;
   min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* Auth Page specific (applied via JS or if no class) */
+body:not(.dashboard-body) {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -227,9 +233,12 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  width: 100%;
   padding: 0;
-  overflow-y: auto;
-  /* Allow scrolling */
+  margin: 0;
+  overflow: hidden;
+  align-items: stretch;
+  justify-content: flex-start;
 }
 
 /* Top Navbar */
@@ -241,10 +250,11 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  position: sticky;
-  top: 0;
-  z-index: 50;
+  position: relative;
+  z-index: 1000;
+  /* Ensure it stays above everything */
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  flex-shrink: 0;
 }
 
 .nav-brand {
@@ -405,8 +415,9 @@ body {
   top: 64px;
   left: 0;
   right: 0;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  z-index: 49;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  z-index: 1001;
+  /* Above top-navbar */
 }
 
 .mobile-menu.active {
@@ -603,28 +614,25 @@ body {
   height: 16px;
 }
 
-/* Mobile Toggle */
-.mobile-menu-btn {
-  display: none;
-  color: #374151;
-  padding: 8px;
-  margin-left: 8px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-}
+/* Removed duplicate mobile toggle */
 
 /* Main Content */
 .main-content {
   flex: 1;
-  padding: 32px;
-  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: calc(100vh - 64px);
+  background: #f3f4f6;
   width: 100%;
-  margin: 0 auto;
+  position: relative;
+  /* Ensure it doesn't create a new stacking context that isolates children */
 }
 
 .content-header {
-  margin-bottom: 24px;
+  padding: 32px 32px 16px 32px;
+  background: #f3f4f6;
+  flex-shrink: 0;
 }
 
 .content-header h2 {
@@ -632,37 +640,14 @@ body {
   color: #111827;
 }
 
-/* Mobile Menu (Hidden) */
-.mobile-menu {
-  display: none;
-  background: white;
-  border-top: 1px solid #e5e7eb;
-  padding: 16px;
-  position: absolute;
-  top: 64px;
-  left: 0;
-  right: 0;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  z-index: 49;
+#dynamicHeader {
+  flex-shrink: 0;
+  background: #f3f4f6;
+  padding: 0 32px;
+  /* z-index removed to prevent stacking context conflicts with mobile menu */
 }
 
-.mobile-menu.active {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.mobile-menu .nav-btn {
-  width: 100%;
-  height: 48px;
-  border-bottom: none;
-  border-radius: 8px;
-  padding: 0 16px;
-}
-
-.mobile-menu .nav-btn.active {
-  background: #eef2ff;
-}
+/* Removed duplicate mobile menu */
 
 /* Responsive adjustment */
 @media (max-width: 1024px) {
@@ -701,6 +686,158 @@ body {
   .main-content {
     padding: 20px;
   }
+
+  /* Reset z-index for sticky elements to prevent overlap with mobile menu */
+  th {
+    z-index: 1 !important;
+  }
+
+  .section-header {
+    z-index: 1 !important;
+  }
+
+  #dynamicHeader {
+    z-index: 1 !important;
+  }
+
+  /* ===== MOBILE READABILITY ENHANCEMENTS ===== */
+
+  /* Increase base font sizes */
+  body {
+    font-size: 14px;
+  }
+
+  /* Better content spacing */
+  .content-header {
+    padding: 20px 16px 12px 16px;
+  }
+
+  .content-header h2 {
+    font-size: 1.375rem;
+  }
+
+  #dynamicHeader {
+    padding: 0 16px;
+  }
+
+  .content-area {
+    padding: 0 16px 24px 16px;
+  }
+
+  /* Improve table readability */
+  th {
+    font-size: 0.6875rem;
+    padding: 10px 12px;
+    white-space: nowrap;
+  }
+
+  td {
+    font-size: 0.8125rem;
+    padding: 12px;
+    line-height: 1.5;
+  }
+
+  /* Make buttons more touch-friendly */
+  .btn-primary,
+  .btn-sm {
+    min-height: 44px;
+    padding: 12px 16px;
+    font-size: 0.875rem;
+  }
+
+  .action-bar {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* Improve badge readability */
+  .badge {
+    font-size: 0.6875rem;
+    padding: 6px 10px;
+    white-space: nowrap;
+  }
+
+  /* Better card spacing */
+  .card {
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  /* Dashboard cards - stack on mobile */
+  .dashboard-cards {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  /* Stats grid - single column */
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  /* Tab buttons - better touch targets */
+  .tab-btn {
+    min-height: 44px;
+    font-size: 0.875rem;
+    padding: 10px 16px;
+  }
+
+  .tabs-bar {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  /* Improve table container */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Better form inputs */
+  .form-group input,
+  .form-group select {
+    font-size: 16px;
+    /* Prevents zoom on iOS */
+    padding: 12px;
+    min-height: 44px;
+  }
+
+  /* Improve section headers */
+  .section-header {
+    font-size: 0.9375rem;
+    padding: 10px 12px;
+    margin-top: 24px;
+  }
+
+  /* Table-specific mobile optimizations */
+  table {
+    font-size: 0.8125rem;
+  }
+
+  /* Allow text wrapping in table cells for better mobile display */
+  td {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 150px;
+    /* Prevent extremely wide cells */
+  }
+
+  /* Make first column (usually ID/Name) slightly wider */
+  td:first-child,
+  th:first-child {
+    min-width: 80px;
+  }
+
+  /* Reduce horizontal scrolling by making table more compact */
+  .table-container {
+    font-size: 0.75rem;
+  }
+
+  /* Better visual hierarchy for table headers */
+  th {
+    background: #f9fafb;
+    font-weight: 700;
+  }
 }
 
 /* Removed Sidebar Styles */
@@ -711,6 +848,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  height: calc(100vh - 64px);
 }
 
 .top-bar {
@@ -749,8 +887,10 @@ body {
 
 .content-area {
   flex: 1;
-  padding: 32px;
+  padding: 0 32px 32px 32px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Stats Grid */
@@ -766,6 +906,7 @@ body {
   padding: 24px;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-top: 32px;
 }
 
 .stat-label {
@@ -794,7 +935,7 @@ table {
 }
 
 th {
-  background: #f9fafb;
+  background: #ffffff;
   text-align: left;
   padding: 12px 24px;
   font-size: 0.75rem;
@@ -803,6 +944,11 @@ th {
   color: #6b7280;
   letter-spacing: 0.05em;
   border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  /* Sticks to top of scrollable contentArea */
+  z-index: 10;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
 }
 
 td {
@@ -826,6 +972,37 @@ tr:hover td {
   justify-content: flex-end;
   margin-bottom: 24px;
 }
+
+.tabs-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 12px;
+}
+
+/* When tabs and action bar are both present, action bar should be below tabs */
+.tabs-bar+.action-bar {
+  top: 60px;
+}
+
+/* Adjust table header top when bars are present */
+.action-bar+.table-container thead th {
+  top: 68px;
+  /* Offset for action bar */
+}
+
+.tabs-bar+.table-container thead th {
+  top: 60px;
+  /* Offset for tabs bar */
+}
+
+.tabs-bar+.action-bar+.table-container thead th {
+  top: 120px;
+  /* Offset for both */
+}
+
+/* Removed empty ruleset */
 
 .btn-primary {
   background: #4f46e5;
@@ -914,6 +1091,8 @@ tr:hover td {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 24px;
+  margin-top: 32px;
+  /* Add top margin since content-area padding-top is 0 */
 }
 
 .dashboard-card {
@@ -996,14 +1175,7 @@ tr:hover td {
   color: #9ca3af;
 }
 
-/* Tabs */
-.tabs-bar {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
-  border-bottom: 1px solid #e5e7eb;
-  padding-bottom: 12px;
-}
+/* Tabs deleted as they are now defined above to support ordering */
 
 .tab-btn {
   padding: 8px 16px;
@@ -1032,10 +1204,17 @@ tr:hover td {
   font-weight: 600;
   color: #374151;
   margin-bottom: 12px;
-  padding: 8px 0;
+  margin-top: 32px;
+  padding: 8px 16px;
   border-bottom: 2px solid #4f46e5;
-  display: inline-block;
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: #f3f4f6;
 }
+
+/* Legacy stacking logic removed */
 
 /* Badge info */
 .badge.info {
@@ -1046,6 +1225,7 @@ tr:hover td {
 /* Profile Form */
 .profile-card {
   max-width: 600px;
+  margin-top: 32px;
 }
 
 .form-row {
@@ -1148,7 +1328,8 @@ tr:hover td {
   gap: 32px;
   max-width: 1100px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 32px 20px 20px 20px;
+  /* Restored top padding */
 }
 
 .order-header {

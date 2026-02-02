@@ -103,6 +103,7 @@ function showSection(sectionId) {
     'logs': t('nav.logs')
   };
   document.getElementById('pageTitle').innerText = titles[sectionId] || t('header.dashboard');
+  document.getElementById('dynamicHeader').innerHTML = ''; // Clear tools by default
   document.getElementById('contentArea').innerHTML = `<p>${t('label.loading')}</p>`;
 
   switch (sectionId) {
@@ -267,7 +268,7 @@ async function loadOrders(filter = 'all') {
     completed: allOrders.filter(o => o.status === 'completed').length
   };
 
-  let html = `
+  const headerHtml = `
     <div class="tabs-bar">
       <button class="tab-btn ${filter === 'all' ? 'active' : ''}" onclick="loadOrders('all')">${t('tab.all')} (${allOrders.length})</button>
       <button class="tab-btn ${filter === 'pending' ? 'active' : ''}" onclick="filterOrders('pending')">${t('status.pending')} (${counts.pending})</button>
@@ -277,6 +278,9 @@ async function loadOrders(filter = 'all') {
     <div class="action-bar">
       <button class="btn-primary" onclick="addOrder()">${t('btn.record_manual')}</button>
     </div>
+  `;
+
+  let html = `
     <div class="table-container">
       <table>
         <thead><tr><th>${t('th.order_id')}</th><th>${t('th.item')}</th><th>${t('th.qty')}</th><th>${t('th.requested_by')}</th><th>${t('th.ward')}</th><th>${t('th.urgency')}</th><th>${t('th.rider')}</th><th>${t('th.status')}</th><th>${t('th.actions')}</th></tr></thead>
@@ -311,6 +315,7 @@ async function loadOrders(filter = 'all') {
   });
 
   html += '</tbody></table></div>';
+  document.getElementById('dynamicHeader').innerHTML = headerHtml;
   document.getElementById('contentArea').innerHTML = html;
 }
 
@@ -326,7 +331,7 @@ function loadOrdersFiltered(filter, filtered) {
     completed: allOrders.filter(o => o.status === 'completed').length
   };
 
-  let html = `
+  const headerHtml = `
     <div class="tabs-bar">
       <button class="tab-btn ${filter === 'all' ? 'active' : ''}" onclick="loadOrders('all')">${t('tab.all')} (${allOrders.length})</button>
       <button class="tab-btn ${filter === 'pending' ? 'active' : ''}" onclick="filterOrders('pending')">${t('status.pending')} (${counts.pending})</button>
@@ -336,6 +341,9 @@ function loadOrdersFiltered(filter, filtered) {
     <div class="action-bar">
       <button class="btn-primary" onclick="addOrder()">${t('btn.record_manual')}</button>
     </div>
+  `;
+
+  let html = `
     <div class="table-container">
       <table>
         <thead><tr><th>${t('th.order_id')}</th><th>${t('th.item')}</th><th>${t('th.qty')}</th><th>${t('th.requested_by')}</th><th>${t('th.ward')}</th><th>${t('th.urgency')}</th><th>${t('th.rider')}</th><th>${t('th.status')}</th><th>${t('th.actions')}</th></tr></thead>
@@ -370,6 +378,7 @@ function loadOrdersFiltered(filter, filtered) {
   });
 
   html += '</tbody></table></div>';
+  document.getElementById('dynamicHeader').innerHTML = headerHtml;
   document.getElementById('contentArea').innerHTML = html;
 }
 
@@ -418,8 +427,7 @@ async function loadStock() {
 }
 
 function renderStockTable(items) {
-
-  let html = `
+  const headerHtml = `
     <div class="action-bar" style="display: flex; gap: 10px; align-items: center;">
       <button class="btn-primary" onclick="addItem()">${t('btn.add_item')}</button>
       <div style="margin-left: auto; display: flex; gap: 8px;">
@@ -428,6 +436,9 @@ function renderStockTable(items) {
         <button class="btn-sm" onclick="sortStock('status')" style="background: white; border: 1px solid #d1d5db;">${t('th.status')}</button>
       </div>
     </div>
+  `;
+
+  let html = `
     <div class="table-container">
       <table>
         <thead><tr><th>${t('th.name')}</th><th>${t('th.category')}</th><th>${t('th.qty')}</th><th>${t('th.unit')}</th><th>${t('th.min_stock')}</th><th>${t('th.supplier')}</th><th>${t('th.status')}</th><th>${t('th.actions')}</th></tr></thead>
@@ -460,6 +471,7 @@ function renderStockTable(items) {
   });
 
   html += '</tbody></table></div>';
+  document.getElementById('dynamicHeader').innerHTML = headerHtml;
   document.getElementById('contentArea').innerHTML = html;
 }
 
@@ -508,6 +520,12 @@ async function addItem() {
 async function loadApprovals() {
   const users = await api('/admin/pending-users');
 
+  const headerHtml = `
+    <div class="action-bar" style="justify-content: flex-start;">
+      <h3 style="margin:0;">${t('nav.approvals')}</h3>
+    </div>
+  `;
+
   let html = `
     <div class="table-container">
       <table>
@@ -533,6 +551,7 @@ async function loadApprovals() {
   });
 
   html += '</tbody></table></div>';
+  document.getElementById('dynamicHeader').innerHTML = headerHtml;
   document.getElementById('contentArea').innerHTML = html;
 }
 
@@ -557,11 +576,13 @@ async function loadDeliveryPersonnel() {
   const available = personnel.filter(p => p.status === 'available');
   const assigned = personnel.filter(p => p.status === 'on_delivery');
 
-  let html = `
+  const headerHtml = `
     <div class="action-bar">
       <button class="btn-primary" onclick="addDeliveryPerson()">+ ${t('nav.delivery')}</button>
     </div>
-    
+  `;
+
+  let html = `
     <div class="section-header">${t('p_status.available')} (${available.length})</div>
     <div class="table-container" style="margin-bottom: 24px;">
       <table>
@@ -603,6 +624,7 @@ async function loadDeliveryPersonnel() {
   });
 
   html += '</tbody></table></div>';
+  document.getElementById('dynamicHeader').innerHTML = headerHtml;
   document.getElementById('contentArea').innerHTML = html;
 }
 
@@ -635,11 +657,13 @@ async function loadDistributions() {
     grouped[d.destination].push(d);
   });
 
-  let html = `
+  const headerHtml = `
     <div class="action-bar">
       <button class="btn-primary" onclick="recordDistribution()">${t('btn.record_manual')}</button>
     </div>
   `;
+
+  let html = '';
 
   const destinations = Object.keys(grouped);
   if (destinations.length === 0) {
@@ -667,6 +691,7 @@ async function loadDistributions() {
     html += '</tbody></table></div>';
   });
 
+  document.getElementById('dynamicHeader').innerHTML = headerHtml;
   document.getElementById('contentArea').innerHTML = html;
 }
 
@@ -707,13 +732,16 @@ async function loadLogs() {
   logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
   cachedLogs = logs; // Cache for export
 
-  let html = `
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+  const headerHtml = `
+    <div class="action-bar" style="display:flex; justify-content:space-between; align-items:center;">
       <h3 style="margin:0;">${t('nav.logs')}</h3>
       <button onclick="exportLogsToExcel()" style="background:#059669; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:8px;">
         📥 ${t('nav.logs')} Export
       </button>
     </div>
+  `;
+
+  let html = `
     <div class="table-container">
       <table>
         <thead><tr><th>${t('th.timestamp')}</th><th>${t('th.role')}</th><th>${t('th.action')}</th><th>${t('th.notes')}</th></tr></thead>
@@ -730,6 +758,7 @@ async function loadLogs() {
   });
 
   html += '</tbody></table></div>';
+  document.getElementById('dynamicHeader').innerHTML = headerHtml;
   document.getElementById('contentArea').innerHTML = html;
 }
 
@@ -764,7 +793,7 @@ function exportLogsToExcel() {
 async function loadAnalytics() {
   const content = document.getElementById('contentArea');
   content.innerHTML = `
-    <div style="display: grid; grid-template-columns: 1fr; gap: 24px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 24px;">
       <div class="card" style="padding: 24px; border-radius: 12px; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         <h3 style="margin-bottom: 20px; color: #1f2937;">${t('label.usage_ward')}</h3>
         <div style="height: 400px; position: relative;">

@@ -112,6 +112,7 @@ function showSection(sectionId) {
     'profile': t('nav.profile')
   };
   document.getElementById('pageTitle').innerText = titles[sectionId];
+  document.getElementById('dynamicHeader').innerHTML = ''; // Clear tools
   document.getElementById('contentArea').innerHTML = `<p>${t('label.loading')}</p>`;
 
   switch (sectionId) {
@@ -417,6 +418,12 @@ async function loadHistory() {
   const requests = await api(`/user/requests/${currentUser.id}`);
   requests.sort((a, b) => b.id - a.id);
 
+  const headerHtml = `
+    <div class="action-bar" style="justify-content: flex-start;">
+      <h3 style="margin:0;">${t('nav.history')}</h3>
+    </div>
+  `;
+
   let html = `
     <div class="table-container">
       <table>
@@ -449,6 +456,7 @@ async function loadHistory() {
   });
 
   html += '</tbody></table></div>';
+  document.getElementById('dynamicHeader').innerHTML = headerHtml;
   document.getElementById('contentArea').innerHTML = html;
 }
 

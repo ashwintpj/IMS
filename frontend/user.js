@@ -430,7 +430,7 @@ async function loadHistory() {
 
   requests.forEach(r => {
     const statusClass = r.status === 'completed' ? 'active' : r.status === 'out_for_delivery' ? 'info' : r.status === 'rejected' || r.status === 'cancelled' ? 'danger' : 'warning';
-    const date = r.created_at ? new Date(r.created_at).toLocaleDateString() : 'Just now';
+    const date = r.created_at ? formatDateTime(r.created_at) : 'Just now';
 
     // Build items display string
     const itemsStr = (r.items || []).map(i => `${t(i.name)} (${i.quantity})`).join(', ');

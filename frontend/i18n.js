@@ -27,6 +27,7 @@ const translations = {
         'status.completed': 'Completed',
         'status.delivered': 'Delivered',
         'status.low_stock': 'Low Stock',
+        'status.out_of_stock': 'Out of Stock',
         'status.in_stock': 'In Stock',
         'status.active': 'Active',
         'status.rejected': 'Rejected',
@@ -188,6 +189,7 @@ const translations = {
         'status.completed': '完了',
         'status.delivered': '配達済み',
         'status.low_stock': '在庫少',
+        'status.out_of_stock': '在庫切れ',
         'status.in_stock': '在庫あり',
         'status.active': '有効',
         'status.rejected': '却下',
@@ -337,6 +339,20 @@ function updateButtonLabel() {
 
 function t(key) {
     return translations[currentLang][key] || key;
+}
+
+function formatDateTime(dateInput) {
+    if (!dateInput) return '-';
+    const d = new Date(dateInput);
+    if (isNaN(d.getTime())) return '-';
+
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const HH = String(d.getHours()).padStart(2, '0');
+    const MM = String(d.getMinutes()).padStart(2, '0');
+
+    return `${yyyy}/${mm}/${dd} ${HH}:${MM}`;
 }
 
 function applyTranslations() {

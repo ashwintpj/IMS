@@ -181,11 +181,12 @@ async function loadDashboard() {
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
         </div>
         <div class="card-content">
-          <div class="card-value">${items.length}</div>
+          <div class="card-value ${items.filter(i => i.quantity === 0).length > 0 ? 'alert' : ''}">${items.length}</div>
           <div class="card-label">${t('card.inventory_items')}</div>
           <div class="card-sub">
-            <span class="badge ${items.filter(i => i.quantity < i.min_stock).length > 0 ? 'inactive' : 'active'}">
-              ${items.filter(i => i.quantity < i.min_stock).length} ${t('status.low_stock')}
+            ${items.filter(i => i.quantity === 0).length > 0 ? `<span class="badge inactive">${items.filter(i => i.quantity === 0).length} ${t('status.out_of_stock')}</span>` : ''}
+            <span class="badge ${items.filter(i => i.quantity > 0 && i.quantity < i.min_stock).length > 0 ? 'warning' : 'active'}">
+              ${items.filter(i => i.quantity > 0 && i.quantity < i.min_stock).length} ${t('status.low_stock')}
             </span>
           </div>
         </div>
@@ -408,12 +409,24 @@ async function addOrder() {
 /* ===================================
    Stock / Inventory
    =================================== */
+let cachedStock = [];
+
 async function loadStock() {
   const items = await api('/admin/inventory');
+  cachedStock = items;
+  renderStockTable(items);
+}
+
+function renderStockTable(items) {
 
   let html = `
-    <div class="action-bar">
+    <div class="action-bar" style="display: flex; gap: 10px; align-items: center;">
       <button class="btn-primary" onclick="addItem()">${t('btn.add_item')}</button>
+      <div style="margin-left: auto; display: flex; gap: 8px;">
+        <span style="font-size: 0.9em; color: #6b7280; align-self: center;">Sort by:</span>
+        <button class="btn-sm" onclick="sortStock('name')" style="background: white; border: 1px solid #d1d5db;">Name</button>
+        <button class="btn-sm" onclick="sortStock('status')" style="background: white; border: 1px solid #d1d5db;">Status</button>
+      </div>
     </div>
     <div class="table-container">
       <table>
@@ -422,7 +435,18 @@ async function loadStock() {
   `;
 
   items.forEach(i => {
-    const status = i.quantity < i.min_stock ? `<span class="badge inactive">${t('status.low_stock')}</span>` : `<span class="badge active">${t('status.in_stock')}</span>`;
+    let statusKey = 'status.in_stock';
+    let badgeClass = 'active';
+
+    if (i.quantity === 0) {
+      statusKey = 'status.out_of_stock';
+      badgeClass = 'inactive';
+    } else if (i.quantity < i.min_stock) {
+      statusKey = 'status.low_stock';
+      badgeClass = 'warning';
+    }
+
+    const status = `<span class="badge ${badgeClass}">${t(statusKey)}</span>`;
     html += `<tr>
       <td>${i.name}</td>
       <td>${i.category}</td>
@@ -437,6 +461,19 @@ async function loadStock() {
 
   html += '</tbody></table></div>';
   document.getElementById('contentArea').innerHTML = html;
+}
+
+function sortStock(criteria) {
+  if (!cachedStock || cachedStock.length === 0) return;
+
+  if (criteria === 'name') {
+    cachedStock.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (criteria === 'status') {
+    // Sort by actual quantity: lowest to highest
+    cachedStock.sort((a, b) => a.quantity - b.quantity);
+  }
+
+  renderStockTable(cachedStock);
 }
 
 async function restockItem(itemId, itemName) {
@@ -622,7 +659,7 @@ async function loadDistributions() {
         <td>${d.item_name}</td>
         <td>${d.quantity}</td>
         <td>${d.ordered_by || '-'}</td>
-        <td>${d.timestamp ? new Date(d.timestamp).toLocaleString() : '-'}</td>
+        <td>${d.timestamp ? formatDateTime(d.timestamp) : '-'}</td>
         <td>${d.delivered_by}</td>
         <td>${d.notes || '-'}</td>
       </tr>`;
@@ -685,7 +722,7 @@ async function loadLogs() {
 
   logs.forEach(l => {
     html += `<tr>
-      <td>${new Date(l.timestamp).toLocaleString()}</td>
+      <td>${formatDateTime(l.timestamp)}</td>
       <td>${l.actor_type.toUpperCase()} <span style="color:#6b7280; font-size:0.9em">(${l.actor_name || 'Unknown'})</span></td>
       <td>${l.action}</td>
       <td>${l.details || '-'}</td>
@@ -704,7 +741,7 @@ function exportLogsToExcel() {
 
   // Prepare data for Excel
   const data = cachedLogs.map(l => ({
-    'Timestamp': new Date(l.timestamp).toLocaleString(),
+    'Timestamp': formatDateTime(l.timestamp),
     'Actor Type': l.actor_type.toUpperCase(),
     'Actor Name': l.actor_name || 'Unknown',
     'Action': l.action,

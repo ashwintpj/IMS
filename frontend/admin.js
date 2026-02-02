@@ -631,7 +631,7 @@ async function loadUsers() {
 }
 
 async function suspendUser(id, name) {
-  if (!confirm(`Are you sure you want to suspend ${name}? They will not be able to access the system.`)) {
+  if (!confirm(t('confirm.suspend_user', { name }))) {
     return;
   }
 
@@ -639,20 +639,20 @@ async function suspendUser(id, name) {
     console.log(`Suspending user ${id}...`);
     const result = await api(`/admin/users/${id}/suspend`, 'PUT');
     console.log('Suspend result:', result);
-    alert(`User ${name} has been suspended successfully.`);
+    alert(t('msg.user_suspended', { name }));
     console.log('Reloading users...');
     await loadUsers();
     console.log('Users reloaded');
   } catch (error) {
     console.error('Suspend error:', error);
-    alert('Failed to suspend user. Please try again.');
+    alert(t('error.suspend_failed'));
   }
 }
 
 async function deleteUser(id, name) {
-  const confirmation = prompt(`⚠️ WARNING: This will permanently delete ${name}.\n\nType "DELETE" to confirm:`);
+  const confirmation = prompt(t('confirm.delete_user', { name }));
   if (confirmation !== 'DELETE') {
-    alert('Deletion cancelled.');
+    alert(t('msg.deletion_cancelled'));
     return;
   }
 
@@ -660,18 +660,18 @@ async function deleteUser(id, name) {
     console.log(`Deleting user ${id}...`);
     const result = await api(`/admin/users/${id}`, 'DELETE');
     console.log('Delete result:', result);
-    alert(`User ${name} has been deleted successfully.`);
+    alert(t('msg.user_deleted', { name }));
     console.log('Reloading users...');
     await loadUsers();
     console.log('Users reloaded');
   } catch (error) {
     console.error('Delete error:', error);
-    alert('Failed to delete user. Please try again.');
+    alert(t('error.delete_failed'));
   }
 }
 
 async function reactivateUser(id, name) {
-  if (!confirm(`Reactivate ${name}? They will be able to access the system again.`)) {
+  if (!confirm(t('confirm.reactivate_user', { name }))) {
     return;
   }
 
@@ -679,13 +679,13 @@ async function reactivateUser(id, name) {
     console.log(`Reactivating user ${id}...`);
     const result = await api(`/admin/users/${id}/reactivate`, 'PUT');
     console.log('Reactivate result:', result);
-    alert(`User ${name} has been reactivated successfully.`);
+    alert(t('msg.user_reactivated', { name }));
     console.log('Reloading users...');
     await loadUsers();
     console.log('Users reloaded');
   } catch (error) {
     console.error('Reactivate error:', error);
-    alert('Failed to reactivate user. Please try again.');
+    alert(t('error.reactivate_failed'));
   }
 }
 

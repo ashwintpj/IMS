@@ -838,6 +838,16 @@ body:not(.dashboard-body) {
     background: #f9fafb;
     font-weight: 700;
   }
+
+  /* Container grid - single column on mobile */
+  .container-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .container-card {
+    padding: 20px;
+  }
 }
 
 /* Removed Sidebar Styles */
@@ -1215,6 +1225,142 @@ tr:hover td {
 }
 
 /* Legacy stacking logic removed */
+
+/* ===================================
+   Collection Container Grid (User Request Page)
+   =================================== */
+.order-container {
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+}
+
+.order-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.order-header h3 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.order-header p {
+  font-size: 1rem;
+  color: #6b7280;
+}
+
+.container-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+  gap: 24px;
+  margin: 24px 0;
+  width: 100%;
+}
+
+.container-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.container-card.has-qty {
+  border-color: #4f46e5;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+}
+
+.container-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.barcode-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.barcode-img {
+  max-width: 180px;
+  height: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+  background: white;
+}
+
+.container-details {
+  text-align: center;
+  width: 100%;
+}
+
+.container-name {
+  display: block;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.container-barcode {
+  display: block;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.qty-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: #f3f4f6;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.btn-qty {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: white;
+  color: #4f46e5;
+  font-size: 1.5rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.btn-qty:hover {
+  background: #4f46e5;
+  color: white;
+  transform: scale(1.05);
+}
+
+.qty-input {
+  width: 80px;
+  height: 44px;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+}
+
+.qty-input:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
 
 /* Badge info */
 .badge.info {

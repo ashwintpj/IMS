@@ -226,7 +226,7 @@ def suspend_user(user_id: int):
         log_entry = {
             "actor_type": "admin",
             "action": "suspend_user",
-            "actor_name": "Admin",  # Should be from token in real app
+            "actor_id": "system",  # Should be from token in real app
             "details": f"Suspended user: {user.get('full_name', 'Unknown')} (ID: {user_id}, Employee ID: {user.get('employee_id', 'N/A')})"
         }
         print(f"Attempting to log: {log_entry}")
@@ -257,7 +257,7 @@ def delete_user(user_id: int):
         log_entry = {
             "actor_type": "admin",
             "action": "delete_user",
-            "actor_name": "Admin",  # Should be from token in real app
+            "actor_id": "system",  # Should be from token in real app
             "details": f"Deleted user: {user.get('full_name', 'Unknown')} (ID: {user_id}, Employee ID: {user.get('employee_id', 'N/A')})"
         }
         print(f"Attempting to log: {log_entry}")
@@ -288,7 +288,7 @@ def reactivate_user(user_id: int):
         log_entry = {
             "actor_type": "admin",
             "action": "reactivate_user",
-            "actor_name": "Admin",  # Should be from token in real app
+            "actor_id": "system",  # Should be from token in real app
             "details": f"Reactivated user: {user.get('full_name', 'Unknown')} (ID: {user_id}, Employee ID: {user.get('employee_id', 'N/A')})"
         }
         print(f"Attempting to log: {log_entry}")

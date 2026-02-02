@@ -396,7 +396,19 @@ async function submitMultiRequest() {
     showSection('history');
   } catch (err) {
     // Show detailed stock error
-    const message = err.message || err.detail || 'Connection error';
+    let message = err.message || err.detail || 'Connection error';
+
+    // Check for insufficient stock error pattern
+    // Pattern: Insufficient stock for 'Item Name'. Requested: 3, Available: 0
+    const stockMatch = message.match(/Insufficient stock for '(.+)'. Requested: (\d+), Available: (\d+)/);
+    if (stockMatch) {
+      message = t('error.insufficient_stock', {
+        name: stockMatch[1],
+        req: stockMatch[2],
+        avail: stockMatch[3]
+      });
+    }
+
     alert('⚠️ ' + message);
 
     // Re-enable button on error

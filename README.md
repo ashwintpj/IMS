@@ -26,6 +26,9 @@ This project was developed as part of an internship program at Techno Project Ja
 
 ## Technical Architecture
 
+### System Architecture
+![System Architecture](docs/architecture.png)
+
 ### Backend
 *   **Framework**: FastAPI (Python)
 *   **Database**: Supabase (PostgreSQL)
@@ -66,4 +69,4 @@ IMS2.0/
 The frontend is built using standard web technologies and can be served using any static web server (e.g., Live Server, Nginx, or Apache).
 
 ## Development Context
-This project represents a professional implementation of a modern inventory management workflow, emphasizing security, performance, and cross-cultural accessibility. It was created to demonstrate integrated full-stack development capabilities during an internship at Techno Project Japan Co., Matsue, Japan.
+This project represents a professional implementation of a modern inventory management workflow, emphasizing security, performance, and cross-cultural accessibility. It was created to demonstrate integrated full-stack development capabilities during my internship at Techno Project Japan Co., Matsue, Japan. 

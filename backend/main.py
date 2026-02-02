@@ -207,6 +207,99 @@ def reject_user(user_id: int):
         raise HTTPException(status_code=404, detail="User not found")
     return {"message": "User rejected"}
 
+@app.put("/admin/users/{user_id}/suspend")
+def suspend_user(user_id: int):
+    # Get user details for logging
+    user_res = supabase.table(TABLE_USERS).select("*").eq("id", user_id).execute()
+    if not user_res.data:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user = user_res.data[0]
+    
+    # Update user status to suspended
+    res = supabase.table(TABLE_USERS).update({"status": "suspended"}).eq("id", user_id).execute()
+    if not res.data:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Log the action
+    try:
+        log_entry = {
+            "actor_type": "admin",
+            "action": "suspend_user",
+            "actor_name": "Admin",  # Should be from token in real app
+            "details": f"Suspended user: {user.get('full_name', 'Unknown')} (ID: {user_id}, Employee ID: {user.get('employee_id', 'N/A')})"
+        }
+        print(f"Attempting to log: {log_entry}")
+        result = supabase.table(TABLE_AUDIT_LOGS).insert(log_entry).execute()
+        print(f"Log result: {result}")
+    except Exception as e:
+        print(f"Failed to log suspend action: {e}")
+        # Don't fail the request if logging fails
+    
+    return {"message": "User suspended successfully"}
+
+@app.delete("/admin/users/{user_id}")
+def delete_user(user_id: int):
+    # Get user details for logging
+    user_res = supabase.table(TABLE_USERS).select("*").eq("id", user_id).execute()
+    if not user_res.data:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user = user_res.data[0]
+    
+    # Delete the user
+    res = supabase.table(TABLE_USERS).delete().eq("id", user_id).execute()
+    if not res.data:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Log the action
+    try:
+        log_entry = {
+            "actor_type": "admin",
+            "action": "delete_user",
+            "actor_name": "Admin",  # Should be from token in real app
+            "details": f"Deleted user: {user.get('full_name', 'Unknown')} (ID: {user_id}, Employee ID: {user.get('employee_id', 'N/A')})"
+        }
+        print(f"Attempting to log: {log_entry}")
+        result = supabase.table(TABLE_AUDIT_LOGS).insert(log_entry).execute()
+        print(f"Log result: {result}")
+    except Exception as e:
+        print(f"Failed to log delete action: {e}")
+        # Don't fail the request if logging fails
+    
+    return {"message": "User deleted successfully"}
+
+@app.put("/admin/users/{user_id}/reactivate")
+def reactivate_user(user_id: int):
+    # Get user details for logging
+    user_res = supabase.table(TABLE_USERS).select("*").eq("id", user_id).execute()
+    if not user_res.data:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user = user_res.data[0]
+    
+    # Update user status to active
+    res = supabase.table(TABLE_USERS).update({"status": "active"}).eq("id", user_id).execute()
+    if not res.data:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Log the action
+    try:
+        log_entry = {
+            "actor_type": "admin",
+            "action": "reactivate_user",
+            "actor_name": "Admin",  # Should be from token in real app
+            "details": f"Reactivated user: {user.get('full_name', 'Unknown')} (ID: {user_id}, Employee ID: {user.get('employee_id', 'N/A')})"
+        }
+        print(f"Attempting to log: {log_entry}")
+        result = supabase.table(TABLE_AUDIT_LOGS).insert(log_entry).execute()
+        print(f"Log result: {result}")
+    except Exception as e:
+        print(f"Failed to log reactivate action: {e}")
+        # Don't fail the request if logging fails
+    
+    return {"message": "User reactivated successfully"}
+
 # -------------------------
 # INVENTORY / STOCK
 # -------------------------

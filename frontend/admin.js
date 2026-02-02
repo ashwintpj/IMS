@@ -98,6 +98,7 @@ function showSection(sectionId) {
     'orders': t('card.container_requests'),
     'stock': t('nav.inventory'),
     'approvals': t('nav.approvals'),
+    'users': t('nav.users'),
     'delivery': t('nav.delivery'),
     'distributions': t('nav.history'),
     'logs': t('nav.logs')
@@ -112,6 +113,7 @@ function showSection(sectionId) {
     case 'orders': loadOrders(); break;
     case 'stock': loadStock(); break;
     case 'approvals': loadApprovals(); break;
+    case 'users': loadUsers(); break;
     case 'delivery': loadDeliveryPersonnel(); break;
     case 'distributions': loadDistributions(); break;
     case 'analytics': loadAnalytics(); break;
@@ -565,6 +567,126 @@ async function rejectUser(id) {
   await api(`/admin/reject-user/${id}`, 'PUT');
   alert(t('msg.user_rejected'));
   loadApprovals();
+}
+
+/* ===================================
+   USER MANAGEMENT
+   =================================== */
+async function loadUsers() {
+  console.log('Loading users...');
+  const users = await api('/admin/users');
+  console.log('Users loaded:', users);
+
+  const headerHtml = `
+    <div class="action-bar" style="justify-content: flex-start;">
+      <h3 style="margin:0;">${t('nav.users')}</h3>
+    </div>
+  `;
+
+  let html = `
+    <div class="table-container">
+      <table>
+        <thead><tr><th>${t('th.employee_id')}</th><th>${t('th.name')}</th><th>${t('th.email')}</th><th>${t('th.department')}</th><th>${t('th.ward')}</th><th>${t('th.status')}</th><th>${t('th.actions')}</th></tr></thead>
+        <tbody>
+  `;
+
+  if (users.length === 0) {
+    html += `<tr><td colspan="7" style="text-align:center;color:#6b7280">${t('nav.users')} (0)</td></tr>`;
+  }
+
+  users.forEach(u => {
+    let statusBadge = '';
+    if (u.status === 'active') {
+      statusBadge = `<span class="badge active">${t('status.active')}</span>`;
+    } else if (u.status === 'pending') {
+      statusBadge = `<span class="badge warning">${t('status.pending')}</span>`;
+    } else if (u.status === 'suspended') {
+      statusBadge = `<span class="badge inactive">${t('status.suspended')}</span>`;
+    } else if (u.status === 'rejected') {
+      statusBadge = `<span class="badge inactive">${t('status.rejected')}</span>`;
+    }
+
+    let actions = '';
+    if (u.status === 'active') {
+      actions = `<button class="btn-sm btn-reject" onclick="suspendUser('${u.id}', '${u.full_name || u.first_name}')">${t('btn.suspend')}</button>`;
+    } else if (u.status === 'suspended') {
+      actions = `<button class="btn-sm btn-approve" onclick="reactivateUser('${u.id}', '${u.full_name || u.first_name}')">${t('btn.reactivate')}</button>`;
+    }
+    actions += ` <button class="btn-sm" style="background:#dc2626;color:white;" onclick="deleteUser('${u.id}', '${u.full_name || u.first_name}')">${t('btn.delete')}</button>`;
+
+    html += `<tr>
+      <td>${u.employee_id || '-'}</td>
+      <td>${u.full_name || u.first_name + ' ' + u.last_name}</td>
+      <td>${u.email || '-'}</td>
+      <td>${u.department || '-'}</td>
+      <td>${u.ward || '-'}</td>
+      <td>${statusBadge}</td>
+      <td>${actions}</td>
+    </tr>`;
+  });
+
+  html += '</tbody></table></div>';
+  document.getElementById('dynamicHeader').innerHTML = headerHtml;
+  document.getElementById('contentArea').innerHTML = html;
+}
+
+async function suspendUser(id, name) {
+  if (!confirm(`Are you sure you want to suspend ${name}? They will not be able to access the system.`)) {
+    return;
+  }
+
+  try {
+    console.log(`Suspending user ${id}...`);
+    const result = await api(`/admin/users/${id}/suspend`, 'PUT');
+    console.log('Suspend result:', result);
+    alert(`User ${name} has been suspended successfully.`);
+    console.log('Reloading users...');
+    await loadUsers();
+    console.log('Users reloaded');
+  } catch (error) {
+    console.error('Suspend error:', error);
+    alert('Failed to suspend user. Please try again.');
+  }
+}
+
+async function deleteUser(id, name) {
+  const confirmation = prompt(`⚠️ WARNING: This will permanently delete ${name}.\n\nType "DELETE" to confirm:`);
+  if (confirmation !== 'DELETE') {
+    alert('Deletion cancelled.');
+    return;
+  }
+
+  try {
+    console.log(`Deleting user ${id}...`);
+    const result = await api(`/admin/users/${id}`, 'DELETE');
+    console.log('Delete result:', result);
+    alert(`User ${name} has been deleted successfully.`);
+    console.log('Reloading users...');
+    await loadUsers();
+    console.log('Users reloaded');
+  } catch (error) {
+    console.error('Delete error:', error);
+    alert('Failed to delete user. Please try again.');
+  }
+}
+
+async function reactivateUser(id, name) {
+  if (!confirm(`Reactivate ${name}? They will be able to access the system again.`)) {
+    return;
+  }
+
+  try {
+    console.log(`Reactivating user ${id}...`);
+    const result = await api(`/admin/users/${id}/reactivate`, 'PUT');
+    console.log('Reactivate result:', result);
+    alert(`User ${name} has been reactivated successfully.`);
+    console.log('Reloading users...');
+    await loadUsers();
+    console.log('Users reloaded');
+  } catch (error) {
+    console.error('Reactivate error:', error);
+    alert('Failed to reactivate user. Please try again.');
+  }
 }
 
 /* ===================================

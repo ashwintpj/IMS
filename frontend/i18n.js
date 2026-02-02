@@ -6,6 +6,7 @@ const translations = {
         'nav.inventory': 'Inventory',
         'nav.approvals': 'Approvals',
         'nav.delivery': 'Delivery',
+        'nav.users': 'Users',
         'nav.history': 'History',
         'nav.logs': 'Logs',
         'nav.profile': 'Profile',
@@ -48,6 +49,9 @@ const translations = {
         'status.low_stock': 'Low Stock',
         'status.out_of_stock': 'Out of Stock',
         'status.in_stock': 'In Stock',
+        'status.suspended': 'Suspended',
+        'status.active': 'Active',
+        'status.rejected': 'Rejected',
         'status.active': 'Active',
         'status.rejected': 'Rejected',
         'status.cancelled': 'Cancelled',
@@ -112,6 +116,8 @@ const translations = {
         'th.order_id': 'Order ID',
         'th.rider': 'Rider',
         'th.urgency': 'Urgency',
+        'th.employee_id': 'Employee ID',
+        'th.department': 'Department',
 
         // Buttons
         'btn.submit': 'Submit Request',
@@ -129,6 +135,9 @@ const translations = {
         'btn.dispatch': 'Dispatch',
         'btn.complete': 'Complete',
         'btn.restock': '+ Restock',
+        'btn.suspend': 'Suspend',
+        'btn.delete': 'Delete',
+        'btn.reactivate': 'Reactivate',
 
         // Personnel Status
         'p_status.available': 'Available',

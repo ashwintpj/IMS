@@ -6,12 +6,31 @@ const translations = {
         'nav.inventory': 'Inventory',
         'nav.approvals': 'Approvals',
         'nav.delivery': 'Delivery',
-        'nav.history': 'Request History',
+        'nav.history': 'History',
         'nav.logs': 'Logs',
         'nav.profile': 'Profile',
         'nav.new_request': 'New Request',
         'nav.analytics': 'Analytics',
         'label.ward_portal': 'Ward Portal',
+        'nav.logout': 'Logout',
+
+        // Login Page
+        'login.welcome': 'Welcome back',
+        'login.subtitle': 'Sign in to your account',
+        'login.tab_user': 'User',
+        'login.tab_admin': 'Admin',
+        'login.btn_signin': 'Sign In',
+        'login.btn_signingin': 'Signing in...',
+        'login.toggle_signup': "Don't have an account? Sign up",
+        'signup.subtitle': 'Create a new staff account',
+        'signup.btn_create': 'Create Account',
+        'signup.btn_creating': 'Creating account...',
+        'signup.toggle_login': 'Already have an account? Sign in',
+        'msg.welcome_redirect': 'Welcome! Redirecting to dashboard...',
+        'error.invalid_credentials': 'Invalid credentials',
+        'error.connection': 'Connection error. Is the server running?',
+        'msg.signup_success': 'Account created! Pending admin approval.',
+        'error.signup_failed': 'Signup failed',
 
         // Dashboard Cards
         'card.pending_approvals': 'Pending User Approvals',
@@ -31,6 +50,9 @@ const translations = {
         'status.in_stock': 'In Stock',
         'status.active': 'Active',
         'status.rejected': 'Rejected',
+        'status.cancelled': 'Cancelled',
+        'status.urgent': 'Urgent',
+        'status.normal': 'Normal',
 
         // Headers & Labels
         'header.dashboard': 'Dashboard',
@@ -58,6 +80,11 @@ const translations = {
         'label.destination': 'Destination',
         'label.notes': 'Notes',
         'label.loading': 'Loading...',
+        'label.password': 'Password',
+        'label.sort_by': 'Sort by:',
+        'label.edit_profile': 'Edit Profile',
+        'label.usage_ward': 'Inventory Usage by Ward',
+        'label.consumption_trends': 'Daily Consumption Trends',
 
         // Table Headers
         'th.item': 'Item',
@@ -82,6 +109,9 @@ const translations = {
         'th.action': 'Action',
         'th.target': 'Target',
         'th.timestamp': 'Timestamp',
+        'th.order_id': 'Order ID',
+        'th.rider': 'Rider',
+        'th.urgency': 'Urgency',
 
         // Buttons
         'btn.submit': 'Submit Request',
@@ -96,6 +126,9 @@ const translations = {
         'btn.mark_completed': 'Mark Completed',
         'btn.send_delivery': 'Send for Delivery',
         'btn.record_manual': 'Record Manual Request',
+        'btn.dispatch': 'Dispatch',
+        'btn.complete': 'Complete',
+        'btn.restock': '+ Restock',
 
         // Personnel Status
         'p_status.available': 'Available',
@@ -139,6 +172,7 @@ const translations = {
         'label.order_id': 'Order #',
         'msg.submit_success': 'Multi-item request submitted successfully!',
         'error.submit_fail': 'Error submitting request:',
+        'msg.submitting': 'Submitting...',
 
         // Profile
         'profile.title': 'My Profile',
@@ -152,14 +186,35 @@ const translations = {
         'profile.save': 'Save Changes',
         'profile.success': 'Profile updated successfully!',
         'profile.error': 'Error updating profile:',
-        'profile.title': 'My Profile',
-        'profile.update_title': 'Update Profile',
-        'profile.employee_id': 'Employee ID',
-        'profile.first_name': 'First Name',
-        'profile.last_name': 'Last Name',
-        'profile.department': 'Department',
-        'profile.ward': 'Ward',
-        'profile.phone': 'Phone'
+
+        // Admin Prompts & Alerts
+        'prompt.item_name': 'Item Name:',
+        'prompt.name': 'Name:',
+        'prompt.quantity': 'Quantity:',
+        'prompt.ordered_by': 'Ordered By (Name):',
+        'prompt.department': 'Department/Ward:',
+        'prompt.destination': 'Destination (Ward/Department):',
+        'prompt.delivered_by': 'Delivered By:',
+        'prompt.notes': 'Notes (optional):',
+        'prompt.category': 'Category:',
+        'prompt.min_stock': 'Min Stock Level:',
+        'prompt.unit': 'Unit (e.g., box, pcs):',
+        'prompt.supplier': 'Supplier Name:',
+        'prompt.phone': 'Phone Number:',
+        'prompt.restock': 'Add quantity to "{name}":',
+        'msg.order_created': 'Order created!',
+        'msg.item_added': 'Item added!',
+        'msg.user_approved': 'User approved!',
+        'msg.user_rejected': 'User rejected!',
+        'msg.delivery_added': 'Delivery person added!',
+        'msg.restock_success': 'Added {qty} units to {itemName}',
+        'msg.status_updated': 'Order status updated to {status}!',
+        'confirm.stock_warning': 'Warning: Requested quantity ({qty}) exceeds available stock ({stock}). Proceed anyway?',
+        'error.valid_qty': 'Please enter a valid quantity',
+        'tab.all': 'All',
+        'msg.no_orders': 'No orders found',
+        'msg.just_now': 'Just now',
+        'msg.na': 'N/A'
     },
     jp: {
         // Navigation
@@ -167,13 +222,32 @@ const translations = {
         'nav.requests': 'リクエスト',
         'nav.inventory': '在庫管理',
         'nav.approvals': '承認待ち',
-        'nav.analytics': '分析',
         'nav.delivery': '配送担当',
-        'nav.history': 'リクエスト履歴',
+        'nav.history': '履歴',
         'nav.logs': 'ログ',
         'nav.profile': 'プロフィール',
         'nav.new_request': '新規リクエスト',
+        'nav.analytics': '分析',
         'label.ward_portal': '病棟ポータル',
+        'nav.logout': 'ログアウト',
+
+        // Login Page
+        'login.welcome': 'おかえりなさい',
+        'login.subtitle': 'アカウントにサインイン',
+        'login.tab_user': 'ユーザー',
+        'login.tab_admin': '管理者',
+        'login.btn_signin': 'サインイン',
+        'login.btn_signingin': 'サインイン中...',
+        'login.toggle_signup': 'アカウントをお持ちではありませんか？ 新規登録',
+        'signup.subtitle': '新しいスタッフアカウントを作成',
+        'signup.btn_create': 'アカウント作成',
+        'signup.btn_creating': 'アカウント作成中...',
+        'signup.toggle_login': '既にアカウントをお持ちですか？ サインイン',
+        'msg.welcome_redirect': 'ようこそ！ダッシュボードへ移動します...',
+        'error.invalid_credentials': '資格情報が無効です',
+        'error.connection': '接続エラー。サーバーは稼働していますか？',
+        'msg.signup_success': 'アカウントが作成されました！管理者の承認待ちです。',
+        'error.signup_failed': '新規登録に失敗しました',
 
         // Dashboard Cards
         'card.pending_approvals': '承認待ちユーザー',
@@ -194,6 +268,8 @@ const translations = {
         'status.active': '有効',
         'status.rejected': '却下',
         'status.cancelled': 'キャンセル済み',
+        'status.urgent': '緊急',
+        'status.normal': '通常',
 
         // Headers & Labels
         'header.dashboard': 'ダッシュボード',
@@ -221,6 +297,11 @@ const translations = {
         'label.destination': '配送先',
         'label.notes': '備考',
         'label.loading': '読み込み中...',
+        'label.password': 'パスワード',
+        'label.sort_by': '並び替え:',
+        'label.edit_profile': 'プロフィール編集',
+        'label.usage_ward': '病棟別在庫使用状況',
+        'label.consumption_trends': '日次消費トレンド',
 
         // Table Headers
         'th.item': '品目',
@@ -245,6 +326,9 @@ const translations = {
         'th.action': '操作',
         'th.target': '対象',
         'th.timestamp': '日時',
+        'th.order_id': '注文ID',
+        'th.rider': '配送員',
+        'th.urgency': '緊急度',
 
         // Buttons
         'btn.submit': 'リクエスト送信',
@@ -259,7 +343,9 @@ const translations = {
         'btn.mark_completed': '完了とする',
         'btn.send_delivery': '配送へ回す',
         'btn.record_manual': '手動リクエスト記録',
-        'btn.cancel': 'キャンセル',
+        'btn.dispatch': '配送開始',
+        'btn.complete': '完了',
+        'btn.restock': '+ 在庫追加',
 
         // Personnel Status
         'p_status.available': '待機中',
@@ -279,6 +365,10 @@ const translations = {
         'btn.confirm_submit': '確定してラボに送信',
         'msg.select_item': '少なくとも1つのアイテムを選択してください。',
         'error.load_containers': '容器の読み込みエラー:',
+        'btn.cancel': 'キャンセル',
+        'msg.cancel_confirm': 'このリクエストをキャンセルしてもよろしいですか？',
+        'msg.cancel_success': 'リクエストをキャンセルしました',
+        'error.cancel_fail': 'キャルセルに失敗しました:',
 
         // Containers (Dynamic Data)
         'Blood Collection Tube (EDTA)': '採血管 (EDTA)',
@@ -299,9 +389,7 @@ const translations = {
         'label.order_id': '注文 #',
         'msg.submit_success': 'リクエストを送信しました！',
         'error.submit_fail': 'リクエスト送信エラー:',
-        'msg.cancel_confirm': 'このリクエストをキャンセルしてもよろしいですか？',
-        'msg.cancel_success': 'リクエストをキャンセルしました',
-        'error.cancel_fail': 'キャルセルに失敗しました:',
+        'msg.submitting': '送信中...',
 
         // Profile
         'profile.title': 'マイプロフィール',
@@ -314,7 +402,36 @@ const translations = {
         'profile.phone': '電話番号',
         'profile.save': '変更を保存',
         'profile.success': 'プロフィールを更新しました！',
-        'profile.error': 'プロフィール更新エラー:'
+        'profile.error': 'プロフィール更新エラー:',
+
+        // Admin Prompts & Alerts
+        'prompt.item_name': '品目名:',
+        'prompt.name': '名前:',
+        'prompt.quantity': '数量:',
+        'prompt.ordered_by': 'リクエスト者 (氏名):',
+        'prompt.department': '部署/病棟:',
+        'prompt.destination': '配送先 (病棟/部署):',
+        'prompt.delivered_by': '配送担当者:',
+        'prompt.notes': '備考 (任意):',
+        'prompt.category': 'カテゴリ:',
+        'prompt.min_stock': '最小在庫数:',
+        'prompt.unit': '単位 (例: 箱, 個):',
+        'prompt.supplier': '仕入先名:',
+        'prompt.phone': '電話番号:',
+        'prompt.restock': '"{name}" に数量を追加:',
+        'msg.order_created': 'リクエストが作成されました！',
+        'msg.item_added': 'アイテムが追加されました！',
+        'msg.user_approved': 'ユーザーが承認されました！',
+        'msg.user_rejected': 'ユーザーが却下されました！',
+        'msg.delivery_added': '配送員が追加されました！',
+        'msg.restock_success': '{itemName} に {qty} 個追加しました',
+        'msg.status_updated': 'ステータスを {status} に更新しました！',
+        'confirm.stock_warning': '警告: リクエスト数量 ({qty}) が現在の在庫 ({stock}) を超えています。続行しますか？',
+        'error.valid_qty': '有効な数量を入力してください',
+        'tab.all': 'すべて',
+        'msg.no_orders': '注文が見つかりませんでした',
+        'msg.just_now': 'たった今',
+        'msg.na': 'なし'
     }
 };
 
@@ -337,8 +454,12 @@ function updateButtonLabel() {
     }
 }
 
-function t(key) {
-    return translations[currentLang][key] || key;
+function t(key, params = {}) {
+    let str = translations[currentLang][key] || key;
+    for (const p in params) {
+        str = str.replace(`{${p}}`, params[p]);
+    }
+    return str;
 }
 
 function formatDateTime(dateInput) {
@@ -358,13 +479,33 @@ function formatDateTime(dateInput) {
 function applyTranslations() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        el.innerText = t(key);
+        const translated = t(key);
+
+        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+            if (el.placeholder) el.placeholder = translated;
+        }
+
+        if (el.hasAttribute('title')) {
+            el.setAttribute('title', translated);
+        }
+
+        // Only update innerText if it's not JUST a container for other elements or if it's specifically for text
+        if (el.children.length === 0 || el.hasAttribute('data-i18n-text-only')) {
+            el.innerText = translated;
+        }
     });
+
+    // Handle special cases
+    const imsAdmin = document.querySelector('.nav-brand h3');
+    if (imsAdmin) imsAdmin.innerText = currentLang === 'en' ? 'IMS Admin' : 'IMS 管理者';
+
+    const wardPortal = document.querySelector('.nav-brand h3[data-i18n="label.ward_portal"]');
+    if (wardPortal) wardPortal.innerText = t('label.ward_portal');
 
     // Re-render current view to apply JS-based translations if function exists
     if (typeof showSection === 'function') {
         const activeBtn = document.querySelector('.nav-btn.active');
-        if (activeBtn) {
+        if (activeBtn && activeBtn.classList.contains('nav-btn')) {
             showSection(activeBtn.dataset.section);
         }
     }

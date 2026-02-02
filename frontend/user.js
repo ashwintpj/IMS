@@ -89,7 +89,7 @@ function toggleMobileMenu() {
       ${langLabel}
     </button>
     <button class="nav-btn logout-mobile" onclick="logout()" style="color:#dc2626;">
-      🚪 Logout
+      🚪 ${t('nav.logout')}
     </button>
   `;
   menu.querySelectorAll('.nav-btn').forEach(btn => {
@@ -109,7 +109,7 @@ function showSection(sectionId) {
     'dashboard': t('header.ward_dashboard'),
     'new-request': t('nav.new_request'),
     'history': t('nav.history'),
-    'profile': 'My Profile'
+    'profile': t('nav.profile')
   };
   document.getElementById('pageTitle').innerText = titles[sectionId];
   document.getElementById('contentArea').innerHTML = `<p>${t('label.loading')}</p>`;
@@ -362,7 +362,7 @@ async function submitMultiRequest() {
   const btn = document.querySelector('.btn-confirm');
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = '⏳ Submitting...';
+    btn.innerHTML = `⏳ ${t('msg.submitting')}`;
     btn.style.opacity = '0.6';
     btn.style.cursor = 'not-allowed';
   }
@@ -430,7 +430,7 @@ async function loadHistory() {
 
   requests.forEach(r => {
     const statusClass = r.status === 'completed' ? 'active' : r.status === 'out_for_delivery' ? 'info' : r.status === 'rejected' || r.status === 'cancelled' ? 'danger' : 'warning';
-    const date = r.created_at ? formatDateTime(r.created_at) : 'Just now';
+    const date = r.created_at ? formatDateTime(r.created_at) : t('msg.just_now');
 
     // Build items display string
     const itemsStr = (r.items || []).map(i => `${t(i.name)} (${i.quantity})`).join(', ');
@@ -440,7 +440,7 @@ async function loadHistory() {
       : '-';
 
     html += `<tr>
-      <td>${t('label.order_id')}${r.id || 'N/A'} [${t(r.urgency === 'Urgent' ? 'urgency.urgent' : 'urgency.normal')}]</td>
+      <td>${t('label.order_id')}${r.id || t('msg.na')} [${t(r.urgency === 'Urgent' ? 'status.urgent' : 'status.normal')}]</td>
       <td>${itemsStr}</td>
       <td><span class="badge ${statusClass}">${t('status.' + r.status)}</span></td>
       <td>${date}</td>

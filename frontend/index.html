@@ -26,30 +26,30 @@
 
     <!-- Login Card -->
     <div class="login-card">
-      <h2>Welcome back</h2>
-      <p class="subtitle">Sign in to your account</p>
+      <h2 data-i18n="login.welcome">Welcome back</h2>
+      <p class="subtitle" data-i18n="login.subtitle">Sign in to your account</p>
 
       <!-- Tabs -->
       <div class="tabs">
-        <button class="tab active" data-type="user" onclick="switchTab('user')">User</button>
-        <button class="tab" data-type="admin" onclick="switchTab('admin')">Admin</button>
+        <button class="tab active" data-type="user" onclick="switchTab('user')" data-i18n="login.tab_user">User</button>
+        <button class="tab" data-type="admin" onclick="switchTab('admin')" data-i18n="login.tab_admin">Admin</button>
       </div>
 
       <!-- Login Form (Visible by default) -->
       <form id="loginForm" onsubmit="handleLogin(event)">
         <div class="form-group">
-          <label for="loginEmail">Email</label>
-          <input type="email" id="loginEmail" placeholder="you@example.com" required>
+          <label for="loginEmail" data-i18n="label.email">Email</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" required data-i18n="label.email">
         </div>
 
         <div class="form-group">
-          <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" placeholder="••••••••" required>
+          <label for="loginPassword" data-i18n="label.password">Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" required data-i18n="label.password">
         </div>
 
         <button type="submit" class="btn-login" id="loginBtn">
-          <span id="loginBtnText">Sign In</span>
-          <span id="loginBtnLoader" class="hidden">Signing in...</span>
+          <span id="loginBtnText" data-i18n="login.btn_signin">Sign In</span>
+          <span id="loginBtnLoader" class="hidden" data-i18n="login.btn_signingin">Signing in...</span>
         </button>
       </form>
 
@@ -57,34 +57,34 @@
       <form id="signupForm" class="hidden" onsubmit="handleSignup(event)">
         <div class="form-row">
           <div class="form-group">
-            <label for="firstName">First Name</label>
-            <input type="text" id="firstName" placeholder="John" required>
+            <label for="firstName" data-i18n="label.first_name">First Name</label>
+            <input type="text" id="firstName" placeholder="John" required data-i18n="label.first_name">
           </div>
           <div class="form-group">
-            <label for="lastName">Last Name</label>
-            <input type="text" id="lastName" placeholder="Doe" required>
+            <label for="lastName" data-i18n="label.last_name">Last Name</label>
+            <input type="text" id="lastName" placeholder="Doe" required data-i18n="label.last_name">
           </div>
         </div>
 
         <div class="form-group">
-          <label for="signupEmail">Email</label>
-          <input type="email" id="signupEmail" placeholder="you@hospital.com" required>
+          <label for="signupEmail" data-i18n="label.email">Email</label>
+          <input type="email" id="signupEmail" placeholder="you@hospital.com" required data-i18n="label.email">
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="employeeId">Employee ID</label>
-            <input type="text" id="employeeId" placeholder="EMP123" required>
+            <label for="employeeId" data-i18n="profile.employee_id">Employee ID</label>
+            <input type="text" id="employeeId" placeholder="EMP123" required data-i18n="profile.employee_id">
           </div>
           <div class="form-group">
-            <label for="signupPassword">Password</label>
-            <input type="password" id="signupPassword" placeholder="••••••••" required>
+            <label for="signupPassword" data-i18n="label.password">Password</label>
+            <input type="password" id="signupPassword" placeholder="••••••••" required data-i18n="label.password">
           </div>
         </div>
 
         <button type="submit" class="btn-login" id="signupBtn">
-          <span id="signupBtnText">Create Account</span>
-          <span id="signupBtnLoader" class="hidden">Creating account...</span>
+          <span id="signupBtnText" data-i18n="signup.btn_create">Create Account</span>
+          <span id="signupBtnLoader" class="hidden" data-i18n="signup.btn_creating">Creating account...</span>
         </button>
       </form>
 
@@ -99,6 +99,7 @@
 
   </div>
 
+  <script src="i18n.js"></script>
   <script src="login.js"></script>
 </body>
 

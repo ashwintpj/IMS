@@ -69,10 +69,10 @@ function toggleMobileMenu() {
 
   menu.innerHTML = links + `
     <button class="nav-btn lang-mobile" onclick="toggleLanguage(); document.getElementById('mobileMenu').classList.remove('active');" style="border-top:1px solid #e5e7eb; margin-top:8px; padding-top:16px;">
-      ${langLabel}
+      🌐 ${currentLang === 'en' ? '日本語に切替' : 'Switch to English'}
     </button>
     <button class="nav-btn logout-mobile" onclick="logout()" style="color:#dc2626;">
-      🚪 Logout
+      🚪 ${t('nav.logout')}
     </button>
   `;
 
@@ -103,7 +103,7 @@ function showSection(sectionId) {
     'logs': t('nav.logs')
   };
   document.getElementById('pageTitle').innerText = titles[sectionId] || t('header.dashboard');
-  document.getElementById('contentArea').innerHTML = '<p>Loading...</p>';
+  document.getElementById('contentArea').innerHTML = `<p>${t('label.loading')}</p>`;
 
   switch (sectionId) {
     case 'dashboard': loadDashboard(); break;
@@ -205,28 +205,28 @@ async function loadProfile() {
 
     document.getElementById('contentArea').innerHTML = `
       <div class="card profile-card">
-        <h3>Edit Profile</h3>
+        <h3>${t('label.edit_profile')}</h3>
         <form onsubmit="saveProfile(event)">
           <div class="form-row">
             <div class="form-group">
-              <label>First Name</label>
+              <label>${t('label.first_name')}</label>
               <input type="text" id="profileFirstName" value="${profile.first_name || ''}" required>
             </div>
             <div class="form-group">
-              <label>Last Name</label>
+              <label>${t('label.last_name')}</label>
               <input type="text" id="profileLastName" value="${profile.last_name || ''}" required>
             </div>
           </div>
           <div class="form-group">
-            <label>Email</label>
+            <label>${t('label.email')}</label>
             <input type="email" id="profileEmail" value="${profile.email || ''}" required>
           </div>
-          <button type="submit" class="btn-primary">Save Changes</button>
+          <button type="submit" class="btn-primary">${t('btn.save')}</button>
         </form>
       </div>
     `;
   } catch (err) {
-    document.getElementById('contentArea').innerHTML = `<p style="color:red">Error loading profile: ${err.message}</p>`;
+    document.getElementById('contentArea').innerHTML = `<p style="color:red">${t('profile.error')} ${err.message}</p>`;
   }
 }
 
@@ -240,11 +240,11 @@ async function saveProfile(e) {
 
   try {
     await api(`/admin/profile/${currentAdminId}`, 'PUT', data);
-    alert('Profile updated successfully!');
+    alert(t('profile.success'));
     const adminName = document.getElementById('adminName');
     if (adminName) adminName.innerText = `${data.first_name} ${data.last_name}`;
   } catch (err) {
-    alert('Error updating profile: ' + (err.message || 'Unknown error'));
+    alert(t('profile.error') + ' ' + (err.message || 'Unknown error'));
   }
 }
 
@@ -269,7 +269,7 @@ async function loadOrders(filter = 'all') {
 
   let html = `
     <div class="tabs-bar">
-      <button class="tab-btn ${filter === 'all' ? 'active' : ''}" onclick="loadOrders('all')">All (${allOrders.length})</button>
+      <button class="tab-btn ${filter === 'all' ? 'active' : ''}" onclick="loadOrders('all')">${t('tab.all')} (${allOrders.length})</button>
       <button class="tab-btn ${filter === 'pending' ? 'active' : ''}" onclick="filterOrders('pending')">${t('status.pending')} (${counts.pending})</button>
       <button class="tab-btn ${filter === 'out_for_delivery' ? 'active' : ''}" onclick="filterOrders('out_for_delivery')">${t('status.out_for_delivery')} (${counts.out_for_delivery})</button>
       <button class="tab-btn ${filter === 'completed' ? 'active' : ''}" onclick="filterOrders('completed')">${t('status.completed')} (${counts.completed})</button>
@@ -279,7 +279,7 @@ async function loadOrders(filter = 'all') {
     </div>
     <div class="table-container">
       <table>
-        <thead><tr><th>Order ID</th><th>${t('th.item')}</th><th>${t('th.qty')}</th><th>${t('th.requested_by')}</th><th>${t('th.ward')}</th><th>Urgency</th><th>Rider</th><th>${t('th.status')}</th><th>${t('th.actions')}</th></tr></thead>
+        <thead><tr><th>${t('th.order_id')}</th><th>${t('th.item')}</th><th>${t('th.qty')}</th><th>${t('th.requested_by')}</th><th>${t('th.ward')}</th><th>${t('th.urgency')}</th><th>${t('th.rider')}</th><th>${t('th.status')}</th><th>${t('th.actions')}</th></tr></thead>
         <tbody>
   `;
 
@@ -328,17 +328,17 @@ function loadOrdersFiltered(filter, filtered) {
 
   let html = `
     <div class="tabs-bar">
-      <button class="tab-btn ${filter === 'all' ? 'active' : ''}" onclick="loadOrders('all')">All (${allOrders.length})</button>
-      <button class="tab-btn ${filter === 'pending' ? 'active' : ''}" onclick="filterOrders('pending')">Pending (${counts.pending})</button>
-      <button class="tab-btn ${filter === 'out_for_delivery' ? 'active' : ''}" onclick="filterOrders('out_for_delivery')">Out for Delivery (${counts.out_for_delivery})</button>
-      <button class="tab-btn ${filter === 'completed' ? 'active' : ''}" onclick="filterOrders('completed')">Completed (${counts.completed})</button>
+      <button class="tab-btn ${filter === 'all' ? 'active' : ''}" onclick="loadOrders('all')">${t('tab.all')} (${allOrders.length})</button>
+      <button class="tab-btn ${filter === 'pending' ? 'active' : ''}" onclick="filterOrders('pending')">${t('status.pending')} (${counts.pending})</button>
+      <button class="tab-btn ${filter === 'out_for_delivery' ? 'active' : ''}" onclick="filterOrders('out_for_delivery')">${t('status.out_for_delivery')} (${counts.out_for_delivery})</button>
+      <button class="tab-btn ${filter === 'completed' ? 'active' : ''}" onclick="filterOrders('completed')">${t('status.completed')} (${counts.completed})</button>
     </div>
     <div class="action-bar">
-      <button class="btn-primary" onclick="addOrder()">+ New Order</button>
+      <button class="btn-primary" onclick="addOrder()">${t('btn.record_manual')}</button>
     </div>
     <div class="table-container">
       <table>
-        <thead><tr><th>Order ID</th><th>Item</th><th>Qty</th><th>Ordered By</th><th>Department</th><th>Urgency</th><th>Rider</th><th>Status</th><th>Actions</th></tr></thead>
+        <thead><tr><th>${t('th.order_id')}</th><th>${t('th.item')}</th><th>${t('th.qty')}</th><th>${t('th.requested_by')}</th><th>${t('th.ward')}</th><th>${t('th.urgency')}</th><th>${t('th.rider')}</th><th>${t('th.status')}</th><th>${t('th.actions')}</th></tr></thead>
         <tbody>
   `;
 
@@ -364,7 +364,7 @@ function loadOrdersFiltered(filter, filtered) {
       <td>${o.department}</td>
       <td>${urgencyBadge}</td>
       <td>${riderName}</td>
-      <td><span class="badge ${statusClass}">${o.status}</span></td>
+      <td><span class="badge ${statusClass}">${t('status.' + o.status)}</span></td>
       <td>${actions}</td>
     </tr>`;
   });
@@ -375,34 +375,34 @@ function loadOrdersFiltered(filter, filtered) {
 
 async function updateOrderStatus(orderId, newStatus) {
   await api(`/admin/orders/${orderId}/status?status=${newStatus}`, 'PUT');
-  alert(`Order status updated to ${newStatus.replace('_', ' ')}!`);
+  alert(t('msg.status_updated', { status: t('status.' + newStatus) }));
   loadOrders('all');
 }
 
 async function addOrder() {
-  const item_name = prompt("Item Name:");
+  const item_name = prompt(t('prompt.item_name'));
   if (!item_name) return;
-  const quantity = parseInt(prompt("Quantity:"), 10);
+  const quantity = parseInt(prompt(t('prompt.quantity')), 10);
   if (isNaN(quantity) || quantity <= 0) return;
 
-  const ordered_by = prompt("Ordered By (Name):");
-  const department = prompt("Department/Ward:");
+  const ordered_by = prompt(t('prompt.ordered_by'));
+  const department = prompt(t('prompt.department'));
 
   // Check stock
   const items = await api('/admin/inventory');
   const selectedItem = items.find(i => i.name === item_name);
   if (selectedItem && quantity > selectedItem.quantity) {
-    if (!confirm(`Warning: Requested quantity (${quantity}) exceeds available stock (${selectedItem.quantity}). Proceed anyway?`)) {
+    if (!confirm(t('confirm.stock_warning', { qty: quantity, stock: selectedItem.quantity }))) {
       return;
     }
   }
 
   try {
     await api('/admin/orders', 'POST', { item_name, quantity, ordered_by, department, status: 'pending' });
-    alert('Order created!');
+    alert(t('msg.order_created'));
     loadOrders('all');
   } catch (err) {
-    alert('Error creating order: ' + (err.detail || 'Insufficient stock or connection error'));
+    alert(t('error.submit_fail') + ' ' + (err.detail || 'Insufficient stock or connection error'));
   }
 }
 
@@ -423,14 +423,14 @@ function renderStockTable(items) {
     <div class="action-bar" style="display: flex; gap: 10px; align-items: center;">
       <button class="btn-primary" onclick="addItem()">${t('btn.add_item')}</button>
       <div style="margin-left: auto; display: flex; gap: 8px;">
-        <span style="font-size: 0.9em; color: #6b7280; align-self: center;">Sort by:</span>
-        <button class="btn-sm" onclick="sortStock('name')" style="background: white; border: 1px solid #d1d5db;">Name</button>
-        <button class="btn-sm" onclick="sortStock('status')" style="background: white; border: 1px solid #d1d5db;">Status</button>
+        <span style="font-size: 0.9em; color: #6b7280; align-self: center;">${t('label.sort_by')}</span>
+        <button class="btn-sm" onclick="sortStock('name')" style="background: white; border: 1px solid #d1d5db;">${t('th.name')}</button>
+        <button class="btn-sm" onclick="sortStock('status')" style="background: white; border: 1px solid #d1d5db;">${t('th.status')}</button>
       </div>
     </div>
     <div class="table-container">
       <table>
-        <thead><tr><th>${t('th.name')}</th><th>${t('th.category')}</th><th>${t('th.qty')}</th><th>${t('th.unit')}</th><th>${t('th.min_stock')}</th><th>${t('th.supplier')}</th><th>${t('th.status')}</th><th>Actions</th></tr></thead>
+        <thead><tr><th>${t('th.name')}</th><th>${t('th.category')}</th><th>${t('th.qty')}</th><th>${t('th.unit')}</th><th>${t('th.min_stock')}</th><th>${t('th.supplier')}</th><th>${t('th.status')}</th><th>${t('th.actions')}</th></tr></thead>
         <tbody>
   `;
 
@@ -455,7 +455,7 @@ function renderStockTable(items) {
       <td>${i.min_stock}</td>
       <td>${i.supplier}</td>
       <td>${status}</td>
-      <td><button class="btn-sm btn-approve" onclick="restockItem(${i.id}, '${i.name}')">+ Restock</button></td>
+      <td><button class="btn-sm btn-approve" onclick="restockItem(${i.id}, '${i.name}')">${t('btn.restock')}</button></td>
     </tr>`;
   });
 
@@ -477,28 +477,28 @@ function sortStock(criteria) {
 }
 
 async function restockItem(itemId, itemName) {
-  const qty = parseInt(prompt(`Add quantity to "${itemName}":`), 10);
+  const qty = parseInt(prompt(t('prompt.restock', { name: itemName })), 10);
   if (isNaN(qty) || qty <= 0) {
-    alert('Please enter a valid quantity');
+    alert(t('error.valid_qty'));
     return;
   }
 
   await api(`/admin/inventory/${itemId}/restock?quantity=${qty}`, 'PUT');
-  alert(`Added ${qty} units to ${itemName}`);
+  alert(t('msg.restock_success', { itemName, qty }));
   loadStock();
 }
 
 async function addItem() {
-  const name = prompt("Item Name:");
+  const name = prompt(t('prompt.item_name'));
   if (!name) return;
-  const category = prompt("Category:");
-  const quantity = parseInt(prompt("Quantity:"), 10);
-  const min_stock = parseInt(prompt("Min Stock Level:"), 10);
-  const unit = prompt("Unit (e.g., box, pcs):");
-  const supplier = prompt("Supplier Name:");
+  const category = prompt(t('prompt.category'));
+  const quantity = parseInt(prompt(t('prompt.quantity')), 10);
+  const min_stock = parseInt(prompt(t('prompt.min_stock')), 10);
+  const unit = prompt(t('prompt.unit'));
+  const supplier = prompt(t('prompt.supplier'));
 
   await api('/admin/inventory', 'POST', { name, category, quantity, min_stock, unit, supplier });
-  alert('Item added!');
+  alert(t('msg.item_added'));
   loadStock();
 }
 
@@ -538,13 +538,13 @@ async function loadApprovals() {
 
 async function approveUser(id) {
   await api(`/admin/approve-user/${id}`, 'PUT');
-  alert('User approved!');
+  alert(t('msg.user_approved'));
   loadApprovals();
 }
 
 async function rejectUser(id) {
   await api(`/admin/reject-user/${id}`, 'PUT');
-  alert('User rejected!');
+  alert(t('msg.user_rejected'));
   loadApprovals();
 }
 
@@ -559,7 +559,7 @@ async function loadDeliveryPersonnel() {
 
   let html = `
     <div class="action-bar">
-      <button class="btn-primary" onclick="addDeliveryPerson()">+ Add Personnel</button>
+      <button class="btn-primary" onclick="addDeliveryPerson()">+ ${t('nav.delivery')}</button>
     </div>
     
     <div class="section-header">${t('p_status.available')} (${available.length})</div>
@@ -612,13 +612,13 @@ async function setDeliveryStatus(personId, status) {
 }
 
 async function addDeliveryPerson() {
-  const name = prompt("Name:");
+  const name = prompt(t('prompt.name') || 'Name:');
   if (!name) return;
-  const phone = prompt("Phone Number:");
+  const phone = prompt(t('prompt.phone') || 'Phone Number:');
   const vehicle_number = "-";
 
   await api('/admin/delivery-personnel', 'POST', { name, phone, vehicle_number, status: 'available' });
-  alert('Delivery person added!');
+  alert(t('msg.delivery_added'));
   loadDeliveryPersonnel();
 }
 
@@ -671,14 +671,14 @@ async function loadDistributions() {
 }
 
 async function recordDistribution() {
-  const item_name = prompt("Item Name:");
+  const item_name = prompt(t('prompt.item_name'));
   if (!item_name) return;
-  const quantity = parseInt(prompt("Quantity:"), 10);
+  const quantity = parseInt(prompt(t('prompt.quantity')), 10);
   if (isNaN(quantity) || quantity <= 0) return;
 
-  const destination = prompt("Destination (Ward/Department):");
-  const delivered_by = prompt("Delivered By:");
-  const notes = prompt("Notes (optional):");
+  const destination = prompt(t('prompt.destination'));
+  const delivered_by = prompt(t('prompt.delivered_by'));
+  const notes = prompt(t('prompt.notes'));
 
   // Check stock
   const items = await api('/admin/inventory');
@@ -711,7 +711,7 @@ async function loadLogs() {
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
       <h3 style="margin:0;">${t('nav.logs')}</h3>
       <button onclick="exportLogsToExcel()" style="background:#059669; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:8px;">
-        📥 Export to Excel
+        📥 ${t('nav.logs')} Export
       </button>
     </div>
     <div class="table-container">
@@ -735,7 +735,7 @@ async function loadLogs() {
 
 function exportLogsToExcel() {
   if (!cachedLogs || cachedLogs.length === 0) {
-    alert('No logs to export');
+    alert(t('msg.history_empty'));
     return;
   }
 
@@ -766,13 +766,13 @@ async function loadAnalytics() {
   content.innerHTML = `
     <div style="display: grid; grid-template-columns: 1fr; gap: 24px;">
       <div class="card" style="padding: 24px; border-radius: 12px; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <h3 style="margin-bottom: 20px; color: #1f2937;">Inventory Usage by Ward</h3>
+        <h3 style="margin-bottom: 20px; color: #1f2937;">${t('label.usage_ward')}</h3>
         <div style="height: 400px; position: relative;">
             <canvas id="wardChart"></canvas>
         </div>
       </div>
       <div class="card" style="padding: 24px; border-radius: 12px; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <h3 style="margin-bottom: 20px; color: #1f2937;">Daily Consumption Trends</h3>
+        <h3 style="margin-bottom: 20px; color: #1f2937;">${t('label.consumption_trends')}</h3>
         <div style="height: 400px; position: relative;">
             <canvas id="trendChart"></canvas>
         </div>

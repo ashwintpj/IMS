@@ -41,14 +41,14 @@ function toggleAuthMode(event) {
     loginForm.classList.add('hidden');
     signupForm.classList.remove('hidden');
     tabs.classList.add('hidden');
-    subtitle.textContent = 'Create a new staff account';
-    toggleText.innerHTML = 'Already have an account? <a href="#" onclick="toggleAuthMode(event)">Sign in</a>';
+    subtitle.textContent = t('signup.subtitle');
+    toggleText.innerHTML = t('signup.toggle_login');
   } else {
     loginForm.classList.remove('hidden');
     signupForm.classList.add('hidden');
     tabs.classList.remove('hidden');
-    subtitle.textContent = 'Sign in to your account';
-    toggleText.innerHTML = 'Don\'t have an account? <a href="#" onclick="toggleAuthMode(event)">Sign up</a>';
+    subtitle.textContent = t('login.subtitle');
+    toggleText.innerHTML = t('login.toggle_signup');
   }
 
   document.getElementById('result').textContent = '';
@@ -92,7 +92,7 @@ async function handleLogin(event) {
     if (response.ok && data.access_token) {
       localStorage.setItem('token', data.access_token);
       localStorage.setItem('userType', currentLoginType);
-      showMessage(`Welcome! Redirecting to dashboard...`, 'success');
+      showMessage(t('msg.welcome_redirect'), 'success');
 
       // Redirect after short delay
       setTimeout(() => {
@@ -103,11 +103,11 @@ async function handleLogin(event) {
         }
       }, 1000);
     } else {
-      result.textContent = data.detail || 'Invalid credentials';
+      result.textContent = data.detail || t('error.invalid_credentials');
       result.className = 'message error';
     }
   } catch (error) {
-    result.textContent = 'Connection error. Is the server running?';
+    result.textContent = t('error.connection');
     result.className = 'message error';
   } finally {
     btn.disabled = false;
@@ -155,16 +155,16 @@ async function handleSignup(event) {
     const data = await response.json();
 
     if (response.ok) {
-      showMessage('Account created! Pending admin approval.', 'success');
+      showMessage(t('msg.signup_success'), 'success');
       setTimeout(() => {
         toggleAuthMode();
       }, 3000);
     } else {
-      result.textContent = data.detail || 'Signup failed';
+      result.textContent = data.detail || t('error.signup_failed');
       result.className = 'message error';
     }
   } catch (error) {
-    result.textContent = 'Connection error. Is the server running?';
+    result.textContent = t('error.connection');
     result.className = 'message error';
   } finally {
     btn.disabled = false;

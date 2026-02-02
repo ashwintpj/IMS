@@ -344,29 +344,51 @@ async function prepareOrderSummary() {
   summaryDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
+let isSubmitting = false;
+
 async function submitMultiRequest() {
-  const profile = await api(`/user/profile/${currentUser.id}`).catch(() => ({}));
-  const containers = await api('/user/containers');
+  // Prevent duplicate submissions
+  if (isSubmitting) return;
 
-  const itemsList = Object.keys(currentOrderItems).map(id => {
-    const c = containers.find(item => item.id == id);
-    return {
-      name: c.name,
-      quantity: currentOrderItems[id]
-    };
-  });
+  const containerIds = Object.keys(currentOrderItems);
+  if (containerIds.length === 0) {
+    alert(t('msg.select_item'));
+    return;
+  }
 
-  const body = {
-    items: itemsList,
-    urgency: currentUrgency,
-    ordered_by: (profile.first_name && profile.last_name) ? `${profile.first_name} ${profile.last_name}` : currentUser.name,
-    ordered_by_id: currentUser.id,
-    department: profile.department || 'Ward Staff',
-    ward: profile.ward || 'General',
-    status: 'pending'
-  };
+  isSubmitting = true;
+
+  // Disable the button visually
+  const btn = document.querySelector('.btn-confirm');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Submitting...';
+    btn.style.opacity = '0.6';
+    btn.style.cursor = 'not-allowed';
+  }
 
   try {
+    const profile = await api(`/user/profile/${currentUser.id}`).catch(() => ({}));
+    const containers = await api('/user/containers');
+
+    const itemsList = Object.keys(currentOrderItems).map(id => {
+      const c = containers.find(item => item.id == id);
+      return {
+        name: c.name,
+        quantity: currentOrderItems[id]
+      };
+    });
+
+    const body = {
+      items: itemsList,
+      urgency: currentUrgency,
+      ordered_by: (profile.first_name && profile.last_name) ? `${profile.first_name} ${profile.last_name}` : currentUser.name,
+      ordered_by_id: currentUser.id,
+      department: profile.department || 'Ward Staff',
+      ward: profile.ward || 'General',
+      status: 'pending'
+    };
+
     await api('/user/requests', 'POST', body);
     alert(t('msg.submit_success'));
     currentOrderItems = {};
@@ -375,6 +397,16 @@ async function submitMultiRequest() {
     // Show detailed stock error
     const message = err.message || err.detail || 'Connection error';
     alert('⚠️ ' + message);
+
+    // Re-enable button on error
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = t('btn.confirm_submit');
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
+    }
+  } finally {
+    isSubmitting = false;
   }
 }
 

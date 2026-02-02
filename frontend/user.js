@@ -81,7 +81,11 @@ function toggleMobileMenu() {
 
   if (menu.children.length === 0) {
     const links = document.querySelector('.nav-links').innerHTML;
-    menu.innerHTML = links;
+    menu.innerHTML = links + `
+      <button class="nav-btn logout-mobile" onclick="logout()" style="color:#dc2626; border-top:1px solid #e5e7eb; margin-top:8px; padding-top:16px;">
+        🚪 Logout
+      </button>
+    `;
     menu.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', () => menu.classList.remove('active'));
     });

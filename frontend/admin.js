@@ -62,22 +62,26 @@ function toggleMobileMenu() {
   const menu = document.getElementById('mobileMenu');
   menu.classList.toggle('active');
 
-  // Populate if empty
-  if (menu.children.length === 0) {
-    const links = document.querySelector('.nav-links').innerHTML;
-    menu.innerHTML = links + `
-      <button class="nav-btn logout-mobile" onclick="logout()" style="color:#dc2626; border-top:1px solid #e5e7eb; margin-top:8px; padding-top:16px;">
-        🚪 Logout
-      </button>
-    `;
+  // Always refresh content to update language label
+  const links = document.querySelector('.nav-links').innerHTML;
+  const currentLang = localStorage.getItem('lang') || 'en';
+  const langLabel = currentLang === 'en' ? '🌐 日本語に切替' : '🌐 Switch to English';
 
-    // Add click listeners to close menu on selection
-    menu.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        menu.classList.remove('active');
-      });
+  menu.innerHTML = links + `
+    <button class="nav-btn lang-mobile" onclick="toggleLanguage(); document.getElementById('mobileMenu').classList.remove('active');" style="border-top:1px solid #e5e7eb; margin-top:8px; padding-top:16px;">
+      ${langLabel}
+    </button>
+    <button class="nav-btn logout-mobile" onclick="logout()" style="color:#dc2626;">
+      🚪 Logout
+    </button>
+  `;
+
+  // Add click listeners to close menu on selection
+  menu.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      menu.classList.remove('active');
     });
-  }
+  });
 }
 
 /* ===================================

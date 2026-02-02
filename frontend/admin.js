@@ -663,11 +663,20 @@ async function recordDistribution() {
 /* ===================================
    Audit Logs
    =================================== */
+let cachedLogs = [];
+
 async function loadLogs() {
   const logs = await api('/admin/logs');
   logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  cachedLogs = logs; // Cache for export
 
   let html = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <h3 style="margin:0;">${t('nav.logs')}</h3>
+      <button onclick="exportLogsToExcel()" style="background:#059669; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:8px;">
+        📥 Export to Excel
+      </button>
+    </div>
     <div class="table-container">
       <table>
         <thead><tr><th>${t('th.timestamp')}</th><th>${t('th.role')}</th><th>${t('th.action')}</th><th>${t('th.notes')}</th></tr></thead>
@@ -685,6 +694,31 @@ async function loadLogs() {
 
   html += '</tbody></table></div>';
   document.getElementById('contentArea').innerHTML = html;
+}
+
+function exportLogsToExcel() {
+  if (!cachedLogs || cachedLogs.length === 0) {
+    alert('No logs to export');
+    return;
+  }
+
+  // Prepare data for Excel
+  const data = cachedLogs.map(l => ({
+    'Timestamp': new Date(l.timestamp).toLocaleString(),
+    'Actor Type': l.actor_type.toUpperCase(),
+    'Actor Name': l.actor_name || 'Unknown',
+    'Action': l.action,
+    'Details': l.details || '-'
+  }));
+
+  // Create workbook and worksheet
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Audit Logs');
+
+  // Generate filename with date
+  const today = new Date().toISOString().split('T')[0];
+  XLSX.writeFile(wb, `audit_logs_${today}.xlsx`);
 }
 
 /* ===================================

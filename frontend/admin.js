@@ -296,11 +296,11 @@ async function loadOrders(filter = 'all') {
   filtered.forEach(o => {
     const statusClass = o.status === 'completed' ? 'active' : o.status === 'out_for_delivery' ? 'info' : 'warning';
     const riderName = o.assigned_rider || '-';
-    const urgencyBadge = o.urgency === 'Urgent' ? '<span class="badge" style="background:#dc2626;color:white;">Urgent</span>' : '<span class="badge" style="background:#d1d5db;">Normal</span>';
+    const urgencyBadge = o.urgency === 'Urgent' ? `<span class="badge" style="background:#dc2626;color:white;">${t('urgency.urgent')}</span>` : `<span class="badge" style="background:#d1d5db;">${t('urgency.normal')}</span>`;
     const actions = o.status === 'pending' ? `
-      <button class="btn-sm btn-approve" onclick="updateOrderStatus('${o.id}', 'out_for_delivery')">Dispatch</button>
+      <button class="btn-sm btn-approve" onclick="updateOrderStatus('${o.id}', 'out_for_delivery')">${t('btn.dispatch')}</button>
     ` : o.status === 'out_for_delivery' ? `
-      <button class="btn-sm btn-approve" onclick="updateOrderStatus('${o.id}', 'completed')">Complete</button>
+      <button class="btn-sm btn-approve" onclick="updateOrderStatus('${o.id}', 'completed')">${t('btn.complete')}</button>
     ` : '-';
 
     html += `<tr>
@@ -359,11 +359,11 @@ function loadOrdersFiltered(filter, filtered) {
   filtered.forEach(o => {
     const statusClass = o.status === 'completed' ? 'active' : o.status === 'out_for_delivery' ? 'info' : 'warning';
     const riderName = o.assigned_rider || '-';
-    const urgencyBadge = o.urgency === 'Urgent' ? '<span class="badge" style="background:#dc2626;color:white;">Urgent</span>' : '<span class="badge" style="background:#d1d5db;">Normal</span>';
+    const urgencyBadge = o.urgency === 'Urgent' ? `<span class="badge" style="background:#dc2626;color:white;">${t('urgency.urgent')}</span>` : `<span class="badge" style="background:#d1d5db;">${t('urgency.normal')}</span>`;
     const actions = o.status === 'pending' ? `
-      <button class="btn-sm btn-approve" onclick="updateOrderStatus('${o.id}', 'out_for_delivery')">Dispatch</button>
+      <button class="btn-sm btn-approve" onclick="updateOrderStatus('${o.id}', 'out_for_delivery')">${t('btn.dispatch')}</button>
     ` : o.status === 'out_for_delivery' ? `
-      <button class="btn-sm btn-approve" onclick="updateOrderStatus('${o.id}', 'completed')">Complete</button>
+      <button class="btn-sm btn-approve" onclick="updateOrderStatus('${o.id}', 'completed')">${t('btn.complete')}</button>
     ` : '-';
 
     html += `<tr>

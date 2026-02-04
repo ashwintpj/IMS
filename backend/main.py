@@ -460,33 +460,40 @@ def update_order_status(order_id: int, status: str):
 
     # Release Rider on Completion
     elif status == "completed":
-        supabase.table(TABLE_ORDERS).update({"status": status}).eq("id", order_id).execute()
-        
-        rider_name = order.get("assigned_rider", "Unknown")
-        if order.get("rider_id"):
-            supabase.table(TABLE_DELIVERY_PERSONNEL).update({"status": "available"}).eq("id", int(order["rider_id"])).execute()
-        
-        # Log order completion
-        supabase.table(TABLE_AUDIT_LOGS).insert({
-            "actor_type": "admin",
-            "actor_id": "system",
-            "action": "order_completed",
-            "details": f"Order #{order_id} completed. Delivered by: {rider_name}"
-        }).execute()
+        try:
+            supabase.table(TABLE_ORDERS).update({"status": status}).eq("id", order_id).execute()
+            
+            rider_name = order.get("assigned_rider", "Unknown")
+            rider_id = order.get("rider_id")
+            
+            if rider_id:
+                # remove int() cast as it might be UUID or string
+                supabase.table(TABLE_DELIVERY_PERSONNEL).update({"status": "available"}).eq("id", rider_id).execute()
+            
+            # Log order completion
+            supabase.table(TABLE_AUDIT_LOGS).insert({
+                "actor_type": "admin",
+                "actor_id": "system",
+                "action": "order_completed",
+                "details": f"Order #{order_id} completed. Delivered by: {rider_name}"
+            }).execute()
 
-        # Record in Distribution History
-        dist_data = {
-            "item_name": order.get("item_name", "Unknown"),
-            "quantity": order.get("quantity", 0),
-            "destination": order.get("department", "Unknown"),
-            "delivered_by": rider_name,
-            "ordered_by": order.get("ordered_by", "Unknown"),
-            "timestamp": datetime.utcnow().isoformat(),
-            "notes": f"Order #{order_id}"
-        }
-        supabase.table(TABLE_DISTRIBUTION_HISTORY).insert(dist_data).execute()
-        
-        return {"message": "Order completed and rider released"}
+            # Record in Distribution History
+            dist_data = {
+                "item_name": order.get("item_name", "Unknown"),
+                "quantity": order.get("quantity", 0),
+                "destination": order.get("department", "Unknown"),
+                "delivered_by": rider_name,
+                "ordered_by": order.get("ordered_by", "Unknown"),
+                "timestamp": datetime.utcnow().isoformat(),
+                "notes": f"Order #{order_id}"
+            }
+            supabase.table(TABLE_DISTRIBUTION_HISTORY).insert(dist_data).execute()
+            
+            return {"message": "Order completed and rider released"}
+        except Exception as e:
+            print(f"Error completing order {order_id}: {e}")
+            raise HTTPException(status_code=500, detail=f"Error completing order: {str(e)}")
 
     else:
         supabase.table(TABLE_ORDERS).update({"status": status}).eq("id", order_id).execute()

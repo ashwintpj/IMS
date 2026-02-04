@@ -479,14 +479,15 @@ def update_order_status(order_id: int, status: str):
             }).execute()
 
             # Record in Distribution History
-            # NOTE: 'ordered_by' column might be missing in DB, so we append it to notes
+            # NOTE: 'ordered_by' and 'timestamp' columns might be missing in DB schema.
+            # We append them to notes to be safe and avoid crash.
+            timestamp_str = datetime.utcnow().isoformat()
             dist_data = {
                 "item_name": order.get("item_name", "Unknown"),
                 "quantity": order.get("quantity", 0),
                 "destination": order.get("department", "Unknown"),
                 "delivered_by": rider_name,
-                "timestamp": datetime.utcnow().isoformat(),
-                "notes": f"Order #{order_id} - Ordered by: {order.get('ordered_by', 'Unknown')}"
+                "notes": f"Order #{order_id} - Ordered by: {order.get('ordered_by', 'Unknown')} - Time: {timestamp_str}"
             }
             supabase.table(TABLE_DISTRIBUTION_HISTORY).insert(dist_data).execute()
             
@@ -580,15 +581,20 @@ def record_distribution(dist: Distribution):
     if not success:
         raise HTTPException(status_code=400, detail=error)
         
-    # NOTE: 'ordered_by' column might be missing in DB, so we handle it manually
+    # NOTE: 'ordered_by' and 'timestamp' might be missing in DB schema.
     data = dist.dict()
     ordered_by = data.pop("ordered_by", "Unknown")
+    timestamp = data.pop("timestamp", None) # Remove timestamp if present
     
+    extra_info = f"Ordered by: {ordered_by}"
+    if timestamp:
+        extra_info += f", Time: {timestamp}"
+
     # Append to notes if notes exists, else create it
     if "notes" in data and data["notes"]:
-        data["notes"] += f" (Ordered by: {ordered_by})"
+        data["notes"] += f" ({extra_info})"
     else:
-        data["notes"] = f"Ordered by: {ordered_by}"
+        data["notes"] = extra_info
 
     supabase.table(TABLE_DISTRIBUTION_HISTORY).insert(data).execute()
     

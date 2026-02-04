@@ -43,7 +43,7 @@ function startLivePolling() {
         case 'dashboard': loadDashboard(); break;
         case 'orders': loadOrders('all'); break;
         case 'stock': loadStock(); break;
-        case 'approvals': loadPendingUsers(); break;
+        case 'approvals': loadApprovals(); break;
         case 'delivery': loadDeliveryPersonnel(); break;
         case 'distributions': loadDistributions(); break;
         case 'logs': loadLogs(); break;

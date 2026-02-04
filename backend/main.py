@@ -414,6 +414,13 @@ def update_order_status(order_id: int, status: str):
 
     # Automated Rider Assignment on Dispatch
     if status == "out_for_delivery":
+        # Find first available rider
+        rider_res = supabase.table(TABLE_DELIVERY_PERSONNEL).select("*").eq("status", "available").limit(1).execute()
+        if not rider_res.data:
+             raise HTTPException(status_code=400, detail="No riders currently available")
+        
+        rider = rider_res.data[0]
+
         # REDUCE INVENTORY FIRST (Atomically)
         items = order.get("items") or [{"name": order.get("item_name"), "quantity": order.get("quantity")}]
         
@@ -426,24 +433,10 @@ def update_order_status(order_id: int, status: str):
                 success, error = deduct_stock_atomic(name, qty)
                 if not success:
                     # Partial failure handling:
-                    # In a real system, we'd need to re-add stock for `deducted_items`.
-                    # For simplicity here, we raise error immediately.
-                    # This might leave some items deducted if it's a multi-item order 
-                    # failing on the 2nd item.
-                    # Given the constraints, we accept this risk vs negative stock.
+                    # In a real system, we'd need to re-add stock for `deducted_items` if multiple.
+                    # Given simpler requirements, we raise error.
                     raise HTTPException(status_code=400, detail=f"Failed to dispatch: {error}")
                 deducted_items.append((name, qty))
-
-        # Find first available rider
-        rider_res = supabase.table(TABLE_DELIVERY_PERSONNEL).select("*").eq("status", "available").limit(1).execute()
-        if not rider_res.data:
-            # OPTIONAL: Rollback stock if no rider? 
-            # Or just let it be pending dispatch?
-            # User requirement was about negative stock.
-            # We will fail request.
-             raise HTTPException(status_code=400, detail="No riders currently available")
-        
-        rider = rider_res.data[0]
         
         # Update order with rider info
         supabase.table(TABLE_ORDERS).update({

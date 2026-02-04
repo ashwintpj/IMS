@@ -135,7 +135,15 @@ async function api(endpoint, method = 'GET', body = null) {
   if (body) options.body = JSON.stringify(body);
 
   const res = await fetch(`${API_BASE_URL}${endpoint}`, options);
-  return res.json();
+  const data = await res.json();
+
+  if (!res.ok) {
+    const error = new Error(data.detail || data.message || 'API Error');
+    error.detail = data.detail; // Attach detail for access
+    throw error;
+  }
+
+  return data;
 }
 
 /* ===================================
@@ -385,9 +393,15 @@ function loadOrdersFiltered(filter, filtered) {
 }
 
 async function updateOrderStatus(orderId, newStatus) {
-  await api(`/admin/orders/${orderId}/status?status=${newStatus}`, 'PUT');
-  alert(t('msg.status_updated', { status: t('status.' + newStatus) }));
-  loadOrders('all');
+  try {
+    await api(`/admin/orders/${orderId}/status?status=${newStatus}`, 'PUT');
+    alert(t('msg.status_updated', { status: t('status.' + newStatus) }));
+    loadOrders('all');
+  } catch (err) {
+    console.error('Update failed:', err);
+    // Display the specific error message from backend (e.g. "Insufficient stock")
+    alert(t('error.update_fail') + ' ' + (err.detail || err.message || 'Unknown error'));
+  }
 }
 
 async function addOrder() {

@@ -80,8 +80,19 @@ def update_user_profile(user_id: str, profile: UserProfileUpdate):
 
 @app.get("/user/containers")
 def get_containers():
-    res = supabase.table(TABLE_SPECIMEN_CONTAINERS).select("*").execute()
-    return res.data
+    # Fetch container definitions
+    containers = supabase.table(TABLE_SPECIMEN_CONTAINERS).select("*").execute().data
+    # Fetch current inventory stock
+    items_res = supabase.table(TABLE_ITEMS).select("name, quantity").execute()
+    
+    # Map stock by item name
+    stock_map = {i["name"]: i["quantity"] for i in items_res.data}
+    
+    # Attach stock to containers
+    for c in containers:
+        c["quantity"] = stock_map.get(c["name"], 0) # Use 'quantity' field to match frontend expectation if any, or add new 'stock' field
+        
+    return containers
 
 @app.post("/create-admin")
 def create_admin(admin: AdminCreate):
@@ -753,6 +764,7 @@ def get_user_requests(user_id: str):
 
 @app.post("/user/requests")
 def create_user_request(order: Order):
+    print(f"DEBUG: Received Order Payload: {order.dict()}")
     # CHECK STOCK AVAILABILITY FIRST
     if order.items:
         for item in order.items:

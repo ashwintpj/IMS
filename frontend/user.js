@@ -232,21 +232,29 @@ async function loadNewRequestForm() {
     let gridHtml = '';
     containers.forEach(c => {
       const hasQtyClass = (currentOrderItems[c.id] > 0) ? 'has-qty' : '';
+      const stock = c.quantity !== undefined ? c.quantity : 9999;
+      const isOutOfStock = stock <= 0;
+
       gridHtml += `
-        <div class="container-card ${hasQtyClass}" id="card_${c.id}">
+        <div class="container-card ${hasQtyClass} ${isOutOfStock ? 'out-of-stock' : ''}" id="card_${c.id}" style="${isOutOfStock ? 'opacity:0.6; pointer-events:none;' : ''}">
           <div class="container-info">
             <div class="barcode-wrapper">
               <img src="${c.barcode_image || 'https://via.placeholder.com/120x60?text=Scan+Code'}" alt="Barcode" class="barcode-img">
             </div>
             <div class="container-details">
               <span class="container-name">${t(c.name)}</span>
-              <span class="container-barcode">#${c.barcode_number || 'ST-9921'}</span>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span class="container-barcode">#${c.barcode_number || 'ST-9921'}</span>
+                  <span class="stock-badge" style="font-size:0.8em; color:${isOutOfStock ? '#ef4444' : '#10b981'}; background:${isOutOfStock ? '#fee2e2' : '#d1fae5'}; padding:2px 8px; border-radius:12px;">
+                      ${isOutOfStock ? t('status.out_of_stock') : 'Stock: ' + stock}
+                  </span>
+              </div>
             </div>
           </div>
           <div class="qty-control">
-            <button type="button" class="btn-qty" onclick="changeQty('${c.id}', -1)">−</button>
-            <input type="number" id="qty_${c.id}" value="${currentOrderItems[c.id] || 0}" min="0" class="qty-input" onchange="updateQtyState('${c.id}', this.value)">
-            <button type="button" class="btn-qty" onclick="changeQty('${c.id}', 1)">+</button>
+            <button type="button" class="btn-qty" onclick="changeQty('${c.id}', -1, ${stock})">−</button>
+            <input type="number" id="qty_${c.id}" value="${currentOrderItems[c.id] || 0}" min="0" max="${stock}" class="qty-input" onchange="updateQtyState('${c.id}', this.value, ${stock})">
+            <button type="button" class="btn-qty" onclick="changeQty('${c.id}', 1, ${stock})">+</button>
           </div>
         </div>
       `;
@@ -288,16 +296,21 @@ async function loadNewRequestForm() {
   }
 }
 
-function changeQty(id, delta) {
+function changeQty(id, delta, maxStock = 9999) {
   const input = document.getElementById('qty_' + id);
   let val = (parseInt(input.value) || 0) + delta;
   if (val < 0) val = 0;
+  if (val > maxStock) val = maxStock;
   input.value = val;
-  updateQtyState(id, val);
+  updateQtyState(id, val, maxStock);
 }
 
-function updateQtyState(id, val) {
-  const qty = parseInt(val);
+function updateQtyState(id, val, maxStock = 9999) {
+  let qty = parseInt(val);
+  if (isNaN(qty) || qty < 0) qty = 0;
+  if (qty > maxStock) qty = maxStock;
+  // Update input if corrected
+  document.getElementById('qty_' + id).value = qty;
   const card = document.getElementById('card_' + id);
   if (qty > 0) {
     currentOrderItems[id] = qty;
@@ -398,13 +411,28 @@ async function submitMultiRequest() {
     const profile = await api(`/user/profile/${currentUser.id}`).catch(() => ({}));
     const containers = await api('/user/containers');
 
-    const itemsList = Object.keys(currentOrderItems).map(id => {
-      const c = containers.find(item => item.id == id);
-      return {
-        name: c.name,
-        quantity: currentOrderItems[id]
-      };
-    });
+    const itemsList = Object.keys(currentOrderItems)
+      .filter(id => currentOrderItems[id] > 0)
+      .map(id => {
+        const c = containers.find(item => item.id == id);
+        return {
+          name: c.name,
+          quantity: currentOrderItems[id]
+        };
+      });
+
+    if (itemsList.length === 0) {
+      alert(t('msg.select_item'));
+      isSubmitting = false;
+      // Re-enable button
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = t('btn.confirm_submit');
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+      }
+      return;
+    }
 
     const body = {
       items: itemsList,

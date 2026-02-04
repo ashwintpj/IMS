@@ -378,30 +378,55 @@ def get_orders():
 
 @app.post("/admin/orders")
 def create_order(order: Order):
-    # ATOMIC DEDUCTION FIRST
-    success, error = deduct_stock_atomic(order.item_name, order.quantity)
-    if not success:
-         raise HTTPException(status_code=400, detail=error)
+    # Handle stock deduction for all items
+    # Since this is an admin manual entry, usually it's one item, but we support list.
+    if order.items:
+        for item in order.items:
+            i_name = item.get("name")
+            i_qty = item.get("quantity", 0)
+            if i_name and i_qty > 0:
+                success, error = deduct_stock_atomic(i_name, i_qty)
+                if not success:
+                    # Note: If multiple items were requested and one failed, previous ones are already deducted.
+                    # Implementing full rollback is complex here.
+                    raise HTTPException(status_code=400, detail=f"Stock deduction failed: {error}")
 
     # Proceed with order creation
     try:
         order_data = order.dict()
+        order_data["status"] = order.status or "pending"
+        order_data["created_at"] = datetime.utcnow().isoformat()
+        
+        # Backward compatibility for legacy item_name and quantity columns
+        if order.items:
+            first_item = order.items[0]
+            other_count = len(order.items) - 1
+            summary = first_item.get("name", "Unknown")
+            if other_count > 0:
+                summary += f" + {other_count} more"
+            order_data["item_name"] = summary
+            order_data["quantity"] = sum(i.get("quantity", 0) for i in order.items)
+
         ins_res = supabase.table(TABLE_ORDERS).insert(order_data).execute()
         
         # Log order creation
         order_id = ins_res.data[0]["id"] if ins_res.data else "unknown"
+        
+        # Format details string
+        details_str = f"Order #{order_id} created."
+        if order.items:
+            items_str = ", ".join([f"{i.get('name')} x{i.get('quantity')}" for i in order.items])
+            details_str += f" Items: {items_str}"
+
         supabase.table(TABLE_AUDIT_LOGS).insert({
             "actor_type": "admin",
             "actor_id": "system",
             "action": "order_created",
-            "details": f"Order #{order_id} created. Item: {order.item_name}, Qty: {order.quantity}"
+            "details": details_str
         }).execute()
 
         return {"message": "Order created and stock updated"}
     except Exception as e:
-        # NOTE: Ideally we should Rollback stock here if order creation fails, 
-        # but manual compensation is complex without transactions. 
-        # For now, we prioritize preventing negative stock.
         print(f"Error creating order after stock deduction: {e}")
         raise HTTPException(status_code=500, detail="Order creation failed, but stock was deducted. Please contact support.")
 

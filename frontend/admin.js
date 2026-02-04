@@ -447,11 +447,21 @@ async function addOrder() {
   }
 
   try {
-    await api('/admin/orders', 'POST', { item_name, quantity, ordered_by, department, status: 'pending' });
+    const payload = {
+      items: [{ name: item_name, quantity: quantity }],
+      ordered_by,
+      department,
+      status: 'pending'
+    };
+    await api('/admin/orders', 'POST', payload);
     alert(t('msg.order_created'));
     loadOrders('all');
   } catch (err) {
-    alert(t('error.submit_fail') + ' ' + (err.detail || 'Insufficient stock or connection error'));
+    let detail = err.detail || err.message || 'Insufficient stock or connection error';
+    if (typeof detail === 'object') {
+      detail = JSON.stringify(detail);
+    }
+    alert(t('error.submit_fail') + ' ' + detail);
   }
 }
 

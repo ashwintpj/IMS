@@ -305,6 +305,13 @@ async function loadOrders(filter = 'all') {
     const statusClass = o.status === 'completed' ? 'active' : o.status === 'out_for_delivery' ? 'info' : 'warning';
     const riderName = o.assigned_rider || '-';
     const urgencyBadge = o.urgency === 'Urgent' ? `<span class="badge" style="background:#dc2626;color:white;">${t('urgency.urgent')}</span>` : `<span class="badge" style="background:#d1d5db;">${t('urgency.normal')}</span>`;
+
+    let itemDisplay = o.item_name;
+    // Check if multiple items exist (either by items array or checking string pattern)
+    if (o.items && o.items.length > 1) {
+      itemDisplay = `<span onclick="showOrderItems('${o.id}')" style="cursor:pointer; color:#4f46e5; text-decoration:underline;">${o.item_name}</span>`;
+    }
+
     const actions = o.status === 'pending' ? `
       <button class="btn-sm btn-approve" onclick="updateOrderStatus('${o.id}', 'out_for_delivery')">${t('btn.dispatch')}</button>
     ` : o.status === 'out_for_delivery' ? `
@@ -313,7 +320,7 @@ async function loadOrders(filter = 'all') {
 
     html += `<tr>
       <td>#${o.id}</td>
-      <td>${o.item_name}</td>
+      <td>${itemDisplay}</td>
       <td>${o.quantity}</td>
       <td>${o.ordered_by}</td>
       <td>${o.department}</td>

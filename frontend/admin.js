@@ -421,7 +421,7 @@ function showOrderItems(orderId) {
   const order = allOrders.find(o => o.id == orderId);
   if (!order || !order.items) return;
 
-  let msg = '📦 Order Details:\n\n';
+  let msg = t('msg.order_details') + '\n\n';
   order.items.forEach(i => {
     msg += `• ${i.name} (x${i.quantity})\n`;
   });

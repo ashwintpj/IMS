@@ -149,6 +149,22 @@ async function api(endpoint, method = 'GET', body = null) {
    Dashboard Home
    =================================== */
 async function loadDashboard() {
+  if (!currentUser.id) {
+    // Try to recover ID from token if not set
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        currentUser.id = payload.sub;
+      } catch (e) {
+        console.error('Token parse fail', e);
+        return; // Can't fetch requests without ID
+      }
+    } else {
+      return; // No token, can't continue
+    }
+  }
+
   const requests = await api(`/user/requests/${currentUser.id}`);
 
   const pending = requests.filter(r => r.status === 'pending').length;

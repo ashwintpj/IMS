@@ -19,8 +19,8 @@ app = FastAPI()
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
+    allow_origins=["https://ims-omega-eosin.vercel.app", "http://localhost:3000", "*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -388,7 +388,6 @@ def create_order(order: Order):
                 success, error = deduct_stock_atomic(i_name, i_qty)
                 if not success:
                     # Note: If multiple items were requested and one failed, previous ones are already deducted.
-                    # Implementing full rollback is complex here.
                     raise HTTPException(status_code=400, detail=f"Stock deduction failed: {error}")
 
     # Proceed with order creation
@@ -507,14 +506,37 @@ def update_order_status(order_id: int, status: str):
             # NOTE: 'ordered_by' and 'timestamp' columns might be missing in DB schema.
             # We append them to notes to be safe and avoid crash.
             timestamp_str = datetime.utcnow().isoformat()
-            dist_data = {
-                "item_name": order.get("item_name", "Unknown"),
-                "quantity": order.get("quantity", 0),
-                "destination": order.get("department", "Unknown"),
-                "delivered_by": rider_name,
-                "notes": f"Order #{order_id} - Ordered by: {order.get('ordered_by', 'Unknown')} - Time: {timestamp_str}"
-            }
-            supabase.table(TABLE_DISTRIBUTION_HISTORY).insert(dist_data).execute()
+            
+            # Use 'items' list if available to respect Foreign Key constraints on item_name
+            items_list = order.get("items")
+            
+            if items_list and isinstance(items_list, list) and len(items_list) > 0:
+                dist_entries = []
+                for item in items_list:
+                    item_name_single = item.get("name")
+                    # Skip if item name is invalid or empty
+                    if not item_name_single: 
+                        continue
+                        
+                    dist_entries.append({
+                        "item_name": item_name_single,
+                        "quantity": item.get("quantity", 0),
+                        "destination": order.get("department", "Unknown"),
+                        "delivered_by": rider_name,
+                        "notes": f"Order #{order_id} (Multi-item) - Ordered by: {order.get('ordered_by', 'Unknown')} - Time: {timestamp_str}"
+                    })
+                if dist_entries:
+                    supabase.table(TABLE_DISTRIBUTION_HISTORY).insert(dist_entries).execute()
+            else:
+                # Fallback for legacy single-item orders
+                dist_data = {
+                    "item_name": order.get("item_name", "Unknown"),
+                    "quantity": order.get("quantity", 0),
+                    "destination": order.get("department", "Unknown"),
+                    "delivered_by": rider_name,
+                    "notes": f"Order #{order_id} - Ordered by: {order.get('ordered_by', 'Unknown')} - Time: {timestamp_str}"
+                }
+                supabase.table(TABLE_DISTRIBUTION_HISTORY).insert(dist_data).execute()
             
             return {"message": "Order completed and rider released"}
         except Exception as e:

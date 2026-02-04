@@ -502,9 +502,7 @@ def update_order_status(order_id: int, status: str):
                 "details": f"Order #{order_id} completed. Delivered by: {rider_name}"
             }).execute()
 
-            # Record in Distribution History
-            # NOTE: 'ordered_by' and 'timestamp' columns might be missing in DB schema.
-            # We append them to notes to be safe and avoid crash.
+
             timestamp_str = datetime.utcnow().isoformat()
             
             # Use 'items' list if available to respect Foreign Key constraints on item_name
@@ -772,6 +770,10 @@ def create_user_request(order: Order):
 
     # Proceed with order
     order_dict = order.dict()
+    # Sanitize ordered_by_id to avoid UUID error if empty string
+    if order_dict.get("ordered_by_id") == "":
+        order_dict["ordered_by_id"] = None
+
     order_dict["status"] = "pending"
     order_dict["created_at"] = datetime.utcnow().isoformat()
 

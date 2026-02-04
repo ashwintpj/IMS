@@ -375,6 +375,16 @@ async function submitMultiRequest() {
 
   isSubmitting = true;
 
+  // Ensure User ID is present
+  if (!currentUser.id) {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        currentUser.id = JSON.parse(atob(token.split('.')[1])).sub;
+      } catch (e) { }
+    }
+  }
+
   // Disable the button visually
   const btn = document.querySelector('.btn-confirm');
   if (btn) {
@@ -400,7 +410,7 @@ async function submitMultiRequest() {
       items: itemsList,
       urgency: currentUrgency,
       ordered_by: (profile.first_name && profile.last_name) ? `${profile.first_name} ${profile.last_name}` : currentUser.name,
-      ordered_by_id: currentUser.id,
+      ordered_by_id: currentUser.id || null,
       department: profile.department || 'Ward Staff',
       ward: profile.ward || 'General',
       status: 'pending'

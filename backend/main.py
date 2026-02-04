@@ -479,14 +479,14 @@ def update_order_status(order_id: int, status: str):
             }).execute()
 
             # Record in Distribution History
+            # NOTE: 'ordered_by' column might be missing in DB, so we append it to notes
             dist_data = {
                 "item_name": order.get("item_name", "Unknown"),
                 "quantity": order.get("quantity", 0),
                 "destination": order.get("department", "Unknown"),
                 "delivered_by": rider_name,
-                "ordered_by": order.get("ordered_by", "Unknown"),
                 "timestamp": datetime.utcnow().isoformat(),
-                "notes": f"Order #{order_id}"
+                "notes": f"Order #{order_id} - Ordered by: {order.get('ordered_by', 'Unknown')}"
             }
             supabase.table(TABLE_DISTRIBUTION_HISTORY).insert(dist_data).execute()
             
@@ -573,13 +573,24 @@ def get_distributions():
     return res.data
 
 @app.post("/admin/distributions")
+@app.post("/admin/distributions")
 def record_distribution(dist: Distribution):
     # ATOMIC DEDUCTION FIRST
     success, error = deduct_stock_atomic(dist.item_name, dist.quantity)
     if not success:
         raise HTTPException(status_code=400, detail=error)
         
-    supabase.table(TABLE_DISTRIBUTION_HISTORY).insert(dist.dict()).execute()
+    # NOTE: 'ordered_by' column might be missing in DB, so we handle it manually
+    data = dist.dict()
+    ordered_by = data.pop("ordered_by", "Unknown")
+    
+    # Append to notes if notes exists, else create it
+    if "notes" in data and data["notes"]:
+        data["notes"] += f" (Ordered by: {ordered_by})"
+    else:
+        data["notes"] = f"Ordered by: {ordered_by}"
+
+    supabase.table(TABLE_DISTRIBUTION_HISTORY).insert(data).execute()
     
     supabase.table(TABLE_AUDIT_LOGS).insert({
         "actor_type": "admin",
